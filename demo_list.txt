@@ -1,0 +1,17 @@
+Cats
+    White
+    Calico
+Computer
+    J
+    Caiti
+Coffee
+    Machine
+        Portafilter
+        Filter
+        Grinder
+    Consumable
+        Coffee
+Rooms
+    Kitchen
+    Lounge
+    Bedroom
