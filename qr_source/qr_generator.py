@@ -94,3 +94,23 @@ def unpack_file(data : List[str], qr_headers : bool, data_structure : Dict[str, 
 def count_leading_tabs(line : str) -> int:
     line = line.replace(' ' * 4, '\t')
     return (len(line) - len(line.lstrip('\t')))
+
+def print_struct_outline(data_structure : Dict, indent_level : int = 0):
+    for key in data_structure:
+        line_string = build_indent_string_print(indent_level)
+        line_string += key
+        print(line_string)
+        if data_structure[key][0]:
+            print_struct_outline(data_structure[key][0], indent_level + 1)
+
+
+
+def build_indent_string_print(indent_level : int):
+    result = ''
+    if indent_level == 0:
+        return result
+    indent_level -= 1
+    for _ in range(indent_level):
+        result += '\t'
+    result += '|___'
+    return result
