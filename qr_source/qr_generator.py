@@ -20,12 +20,25 @@ def build_qr(data : str) -> Image.Image:
     qr.make(fit=True)
     return qr.make_image(fill_color='black', back_color='white')
 
-def load_text_file(path : str, qr_headers : bool = False) -> Dict[str, Tuple[Dict, Image.Image]]:
+def load_text_file(path : str, qr_headers : bool = False, string_header : str = '') -> Dict[str, Tuple[Dict, Image.Image]]:
+    """
+        Builds a data structure from a text file
+
+        Parameters:
+            path: path to text file as a string
+            qr_headers: boolean indicating whether headings in text file are to have QRs generated
+            string_header: string to be set at the start of QR code data to help weed out other QR codes
+
+        Returns:
+            Dictionary data structure where Key is the heading for the level and data is a tuple containing
+                a nested dictionary of the same structure in position 0 and QR code image in position 1. These
+                will be None if neither are required
+    """
     output_data_structure = {}
     with open(path, 'r') as f:
         data = f.readlines()
         data = [x.rstrip() for x in data]
-        unpack_file(data, qr_headers, output_data_structure)
+        unpack_file(data, qr_headers, output_data_structure, previous_levels=string_header)
     
     return output_data_structure
 
