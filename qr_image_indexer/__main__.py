@@ -1,11 +1,7 @@
-from distutils.command.build import build
-
-from setuptools import SetuptoolsDeprecationWarning
 from qr_image_indexer.qr_generator import load_text_file
 from qr_image_indexer.qr_generator import print_struct_outline
 from qr_image_indexer.photo_sorter import sort_directory
 from qr_image_indexer.write_pdf import build_pdf_report
-import os
 
 import argparse
 
