@@ -9,5 +9,6 @@ setup(
         'pillow',
         'reportlab',
         'qrcode'
-    ]
+    ],
+    license='LICENSE'
 )
