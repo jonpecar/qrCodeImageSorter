@@ -4,12 +4,32 @@ from typing import List
 import os
 import shutil
 
-def read_qr_zbar(image_path : str):
+def read_qr_zbar(image_path : str) -> List:
+    """
+        Loads and scans image for qr code using pyzbar
+
+        Arguments:
+            image_path: path to image to scan
+        
+        Returns pyzbar results in list
+    """
     im = Image.open(image_path)
     result = decode(im, symbols = [ZBarSymbol.QRCODE])
     return result
 
-def get_qr(image_path : str, string_header : str = ''):
+def get_qr(image_path : str, string_header : str = '') -> str:
+    """
+        Loads image and attempts to find a QR code
+    
+        Arguments:
+            image_path: string indicating path of photo to scan
+            string_header: optional string that indicates the header to look  for if one was use
+                if a header is passed only QR codes with this header will be returned
+
+        Returns a string indicating content of found QR code. Returns None if nothing found.
+
+        Does not currently handle multiple QR codes. Will raise exception
+    """
     results = read_qr_zbar(image_path)
     valid_results : List(str) = []
     for result in results:

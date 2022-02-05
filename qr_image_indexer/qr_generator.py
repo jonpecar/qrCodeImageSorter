@@ -105,10 +105,25 @@ def unpack_file(data : List[str], qr_headers : bool, data_structure : Dict[str, 
     return index
 
 def count_leading_tabs(line : str) -> int:
+    """
+        Counts leacding tabs in a passed string. Will convert sets of 4 spaces to a tab
+
+        Argument:
+            line: line to count tabs in
+
+        Returns integer with number of tabs
+    """
     line = line.replace(' ' * 4, '\t')
     return (len(line) - len(line.lstrip('\t')))
 
 def print_struct_outline(data_structure : Dict, indent_level : int = 0):
+    """
+        Prints structure outline to command line to provide user output
+
+        Arguments:
+            data_structure: data structure to print
+            indent_level: current level of indent for recursive purposes
+    """
     for key in data_structure:
         line_string = build_indent_string_print(indent_level)
         line_string += key
@@ -119,6 +134,12 @@ def print_struct_outline(data_structure : Dict, indent_level : int = 0):
 
 
 def build_indent_string_print(indent_level : int):
+    """
+        Builds a visibile indent indication for printing to command line
+
+        Arguments:
+            indent_level: level of indentation for the symbol
+    """
     result = ''
     if indent_level == 0:
         return result

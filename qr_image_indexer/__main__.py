@@ -12,17 +12,17 @@ TEXT_FILE = r'C:\Users\Jonat\repos\qrCodeImageSorter\demo_list.txt'
 def main():
     parser = argparse.ArgumentParser()
     mutual_exclusive = parser.add_mutually_exclusive_group()
-    mutual_exclusive.add_argument('--generate-pdf', help='Generate a PDF of QR codes from a given text file. Specify ',
+    mutual_exclusive.add_argument('-g', '--generate-pdf', help='Generate a PDF of QR codes from a given text file. Specify ',
             nargs=2, metavar=('INPUT_TEXT_FILE','OUTPUT_PDF'))
-    mutual_exclusive.add_argument('--sort-photos', help='Sort photos based on QR codes found in photos. Once a QR code is found all photos will be sorted into the directory indicated by the code until subsequent codes found',
+    mutual_exclusive.add_argument('-s', '--sort-photos', help='Sort photos based on QR codes found in photos. Once a QR code is found all photos will be sorted into the directory indicated by the code until subsequent codes found',
             nargs=2, metavar=('INPUT_DIR', 'OUTPUT_DIR'))
 
-    parser.add_argument('--qr-for-headings', help='Generate a QR code for each heading, not just a code for the last items in a tree.',
+    parser.add_argument('-q', '--qr-for-headings', help='Generate a QR code for each heading, not just a code for the last items in a tree.',
             action='store_true')
-    parser.add_argument('--repeat-table-headings', help='Repeat table headings on every line',
+    parser.add_argument('-r', '--repeat-table-headings', help='Repeat table headings on every line',
             action='store_true')
 
-    parser.add_argument('--string-prefix', help='Specify a prefix for use in the generated QR codes to differentiate from codes that might also end up in photos')
+    parser.add_argument('-p', '--string-prefix', help='Specify a prefix for use in the generated QR codes to differentiate from codes that might also end up in photos')
 
     args = parser.parse_args()
 

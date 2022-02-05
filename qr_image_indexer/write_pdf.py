@@ -1,7 +1,8 @@
 from re import template
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, mm
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image, Paragraph
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from typing import Dict, List
@@ -9,23 +10,41 @@ import tempfile
 from PIL.Image import Image as pImage
 import os
 
-FONT = 'calibri.ttf'
-FONT_B = 'calibrib.ttf'
-
 MARGINS = 20
 MAX_QR_HEIGHT = 40 * mm
 
-def build_pdf_report(data_struct : Dict, path : str, repeat_headings : bool = False):
-    temp_files = _build_pdf_report(data_struct, path, repeat_headings)
-    # for f in temp_files:
-    #     os.remove(f.name)
+#We will just create some fonts and set some fixed styles which will be used for the report. No dynamic styles at this stage
 
-def _build_pdf_report(data_struct : Dict, path : str, repeat_headings : bool = False):
+FONT = 'calibri.ttf'
+FONT_B = 'calibrib.ttf'
+
+pdfmetrics.registerFont(TTFont('regular_font', FONT))
+pdfmetrics.registerFont(TTFont('bold_font', FONT_B))
+
+REG_STYLE = ParagraphStyle('regularText',
+                            fontName='regular_font',
+                            fontSize=20,
+                            leading=20)
+BOLD_STYLE = ParagraphStyle('boldText',
+                            fontName='bold_font',
+                            fontSize=20,
+                            leading=20)
+
+def build_pdf_report(data_struct : Dict, path : str, repeat_headings : bool = False):
+    """
+        Builds and saves a PDF document including QR codes and headings
+
+        Arguments:
+            data_structure: data structure in Dict formatted by qe_generator import
+            path: path to save pdf document at
+            repeat_headings: Determines whether to repeat headings on every line or once per doc
+    """
+
+
     doc = SimpleDocTemplate(path, pagesize=A4, rightMargin = MARGINS, leftMargin = MARGINS,
         topMargin = MARGINS, bottomMargin = MARGINS)
 
-    pdfmetrics.registerFont(TTFont('regular_font', FONT))
-    pdfmetrics.registerFont(TTFont('bold_font', FONT_B))
+
 
     temp_files = []
     data = build_data_table(data_struct, temp_files, repeat_headings)
@@ -42,13 +61,13 @@ def _build_pdf_report(data_struct : Dict, path : str, repeat_headings : bool = F
     table.setStyle(
         TableStyle(
             [
-                ('FONTSIZE', (0,0), (-1,-1), 24),
+                #('FONTSIZE', (0,0), (-1,-1), 24),
                 ('VALIGN', (0,0), (-1,-1),'TOP'),
                 ('BOX', (0,0), (-1,-1), 0.125, colors.black),
                 # ('LINEABOVE', (0,0), (-1,-1), 0.125, colors.black),
                 # ('LINEBELOW', (0,0), (-1,-1), 0.125, colors.black),
-                ('FONTNAME', (0,0), (0,-1),'bold_font'),
-                ('FONTNAME', (1,0), (1,-1),'regular_font')
+                #('FONTNAME', (0,0), (0,-1),'bold_font'),
+                #('FONTNAME', (1,0), (1,-1),'regular_font')
             ]
         )
     )
@@ -58,7 +77,7 @@ def _build_pdf_report(data_struct : Dict, path : str, repeat_headings : bool = F
         
 
 def build_data_table(data_struct : Dict, temp_files : List, pass_headings : bool = False,
-        table : List = [], indent_count : int = 0, passed_headings : List = []):
+        table : List = [], indent_count : int = 0, passed_headings : List = []) -> List[List[object]]:
     """
     Builds a table out of the provided data structure. Does not yet add in images, but will later.
 
@@ -81,8 +100,12 @@ def build_data_table(data_struct : Dict, temp_files : List, pass_headings : bool
         else:
             row = [ '' for _ in range(indent_count)]
         
-        # Add next text
-        row.append(key)
+        style = REG_STYLE
+        if len(row) == 0:
+            style = BOLD_STYLE
+
+        # Add next text as paragraph to allow for word wrap
+        row.append(Paragraph(key, style=style))
 
         # If there is an image add it to the row
         if data_struct[key][1]:
@@ -102,7 +125,6 @@ def build_data_table(data_struct : Dict, temp_files : List, pass_headings : bool
         # Recurse if there is more data
         if data_struct[key][0]:
             # Has nested data
-            passed_headings
             table = build_data_table(data_struct[key][0], temp_files, pass_headings,
                 table, indent_count + 1, row[:-1])
         
