@@ -63,7 +63,7 @@ def build_pdf_report(data_struct : Dict, path : str, repeat_headings : bool = Fa
             [
                 #('FONTSIZE', (0,0), (-1,-1), 24),
                 ('VALIGN', (0,0), (-1,-1),'TOP'),
-                ('BOX', (0,0), (-1,-1), 0.125, colors.black),
+                # ('BOX', (0,0), (-1,-1), 0.125, colors.black),
                 # ('LINEABOVE', (0,0), (-1,-1), 0.125, colors.black),
                 # ('LINEBELOW', (0,0), (-1,-1), 0.125, colors.black),
                 #('FONTNAME', (0,0), (0,-1),'bold_font'),
