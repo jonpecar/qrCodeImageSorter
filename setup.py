@@ -15,7 +15,8 @@ setup(
         'pyzbar',
         'pillow',
         'reportlab',
-        'qrcode'
+        'qrcode',
+        'tqdm'
     ],
     license='LICENSE'
 )

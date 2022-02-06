@@ -24,11 +24,16 @@ def main():
 
     parser.add_argument('-p', '--string-prefix', help='Specify a prefix for use in the generated QR codes to differentiate from codes that might also end up in photos')
 
+    parser.add_argument('-v', '--verbose', help='Turn progress text to terminal on or off',
+            action='store_true')
+
     args = parser.parse_args()
 
     string_header = ''
     if args.string_prefix:
         string_header = args.string_prefix
+
+    verbose = args.verbose
     
     if not args.generate_pdf and not args.sort_photos:
         print("Neither sort photos or generate PDF was selected. No action performed.")
@@ -37,20 +42,27 @@ def main():
         output = args.generate_pdf[1]
 
         data_struct = load_text_file(input, args.qr_for_headings, string_header)
-        print('Loaded text file: ' + input)
-        print('')
-        print('Read data structure: ')
-        print_struct_outline(data_struct)
+        if verbose:
+            print('Loaded text file: ' + input)
+            print('')
+            print('Read data structure: ')
+            print_struct_outline(data_struct)
 
         build_pdf_report(data_struct, output, args.repeat_table_headings)
+        if verbose:
+            print('Saved pdf: ' + output)
     if args.sort_photos:
         input = args.sort_photos[0]
         output = args.sort_photos[1]
 
-        found_dirs = sort_directory(input, output, string_header)
+        if verbose:
+            print('Sorting from: ' + input + ', to : ' + output)
 
-        print('Found directories from images:')
-        [print(x) for x in found_dirs]
+        found_dirs = sort_directory(input, output, string_header, args.verbose)
+
+        if verbose:
+            print('Found directories from images:')
+            [print(x) for x in found_dirs]
         
         
 
