@@ -10,8 +10,8 @@
             "request": "launch",
             "module": "qr_image_indexer",
             //"args" : ["--generate-pdf", "demo_list.txt", "test_pdf.pdf", "--string-prefix", "{image}", "--qr-for-headings"]
-            //"args" : ["--sort-photos", "test_images", "test_sort"]
-            "args" : ["-h"]
+            "args" : ["-s", "C:\\Users\\Jonat\\Pictures\\Sort Test\\Input", "C:\\Users\\Jonat\\Pictures\\Sort Test\\Output", "-v", "-p", "{image}"]
+            //"args" : ["-h"]
         }
     ]
 }

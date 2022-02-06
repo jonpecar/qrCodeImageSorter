@@ -1,8 +1,11 @@
 from pyzbar.pyzbar import decode, ZBarSymbol
 from PIL import Image
-from typing import List
+from typing import List, Tuple, Dict
+from multiprocessing import Pool, cpu_count
 import os
 import shutil
+from functools import partial
+import tqdm
 
 def read_qr_zbar(image_path : str) -> List:
     """
@@ -45,7 +48,49 @@ def get_qr(image_path : str, string_header : str = '') -> str:
     else:
         return None
 
-def sort_directory(input_dir : str, output_dir : str, string_header : str = '') -> List[str]:
+def get_qr_mt(image_path : str, string_header : str = '') -> Tuple[str, str]:
+    """
+        Calls get_qr and returns image path and result of get_qr in a tuple to allow multiprocessing
+
+        Arguments:
+            image_path: string indicating path of photo to scan
+            string_header: optional string that indicates the header to look  for if one was use
+                if a header is passed only QR codes with this header will be returned
+
+    """
+    return image_path, get_qr(image_path, string_header)
+
+def get_qr_for_files(files : List[str], string_header : str = '', verbose : bool = False) -> Dict[str, str]:
+    '''
+        Process a list of files using multiprocessing. Will return dictionary of each images'
+        result against it's filename as a key
+
+        Arguments:
+            files: list of file paths as string
+            string_header: string header used in images if any
+            verbose: boolean indicating whether to show progress updates to terminal
+
+        Returns:
+            Dictionary of (str, str) where key is file path and value is the result
+    '''
+    cores = cpu_count()
+    func = partial(get_qr_mt, string_header=string_header)
+    with Pool(processes=cores) as pool:
+        if verbose:
+            results = list(tqdm.tqdm(pool.imap(func, files), total=len(files)))
+        else:
+            results = pool.map(func, files)
+    
+    results_dict = {}
+    for item in results:
+        results_dict[item[0]] = item[1]
+
+    return results_dict
+
+    
+
+
+def sort_directory(input_dir : str, output_dir : str, string_header : str = '', verbose : bool = False) -> List[str]:
     """
         Takes all images in a directory and sorts them by QR codes found in the images. Any
         images which are found before the first QR code will go into an "unsorted" folder in the directory.
@@ -64,12 +109,20 @@ def sort_directory(input_dir : str, output_dir : str, string_header : str = '') 
     found_directories = []
 
     images = os.listdir(input_dir)
+    image_paths = [os.path.join(input_dir, x) for x in images]
+    
+    if verbose:
+        print('Scanning images for QR codes')
+    results = get_qr_for_files(image_paths, string_header=string_header, verbose=verbose)
     os.makedirs(output_dir, exist_ok=True)
 
+
+    if verbose:
+        print('Sorting image files')
     current_path = os.path.join(output_dir, 'unsorted')
-    for image in images:
+    for image in tqdm.tqdm(images) if verbose else images:
         image_path = os.path.join(input_dir, image)
-        qr_string = get_qr(image_path, string_header)
+        qr_string = results[image_path]
         if qr_string:
             current_path = os.path.join(output_dir, qr_string)
             if qr_string not in found_directories:
