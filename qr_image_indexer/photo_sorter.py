@@ -1,5 +1,5 @@
 from pyzbar.pyzbar import decode, ZBarSymbol
-from PIL import Image
+import cv2
 from typing import List, Tuple, Dict
 from multiprocessing import Pool, cpu_count
 import os
@@ -7,20 +7,25 @@ import shutil
 from functools import partial
 import tqdm
 
-def read_qr_zbar(image_path : str) -> List:
+def read_qr_zbar(image_path : str, binarization : bool = False) -> List:
     """
-        Loads and scans image for qr code using pyzbar
+        Loads and scans image for qr code using pyzbar. Processes raw image first. If it fails to find a QR code will
+        try again with binarization using OpenCV with OTSU threshold finding.
 
         Arguments:
             image_path: path to image to scan
         
         Returns pyzbar results in list
     """
-    im = Image.open(image_path)
+    im = cv2.imread(image_path)
     result = decode(im, symbols = [ZBarSymbol.QRCODE])
+    if not result and binarization:
+        im_gray = cv2.cvtColor(im, cv2.COLOR_BGR2GRAY)
+        thres, im_binarized = cv2.threshold(im_gray, 128, 255, cv2.THRESH_OTSU)
+        result = decode(im_binarized, symbols = [ZBarSymbol.QRCODE])
     return result
 
-def get_qr(image_path : str, string_header : str = '') -> str:
+def get_qr(image_path : str, string_header : str = '', binarization : bool = False) -> str:
     """
         Loads image and attempts to find a QR code
     
@@ -33,7 +38,7 @@ def get_qr(image_path : str, string_header : str = '') -> str:
 
         Does not currently handle multiple QR codes. Will raise exception
     """
-    results = read_qr_zbar(image_path)
+    results = read_qr_zbar(image_path, binarization)
     valid_results : List(str) = []
     for result in results:
         str_data :str = result.data.decode('utf-8')
@@ -48,7 +53,7 @@ def get_qr(image_path : str, string_header : str = '') -> str:
     else:
         return None
 
-def get_qr_mt(image_path : str, string_header : str = '') -> Tuple[str, str]:
+def get_qr_mt(image_path : str, string_header : str = '', binarization : bool = False) -> Tuple[str, str]:
     """
         Calls get_qr and returns image path and result of get_qr in a tuple to allow multiprocessing
 
@@ -58,9 +63,9 @@ def get_qr_mt(image_path : str, string_header : str = '') -> Tuple[str, str]:
                 if a header is passed only QR codes with this header will be returned
 
     """
-    return image_path, get_qr(image_path, string_header)
+    return image_path, get_qr(image_path, string_header, binarization)
 
-def get_qr_for_files(files : List[str], string_header : str = '', verbose : bool = False) -> Dict[str, str]:
+def get_qr_for_files(files : List[str], string_header : str = '', verbose : bool = False, binarization : bool = False) -> Dict[str, str]:
     '''
         Process a list of files using multiprocessing. Will return dictionary of each images'
         result against it's filename as a key
@@ -74,7 +79,7 @@ def get_qr_for_files(files : List[str], string_header : str = '', verbose : bool
             Dictionary of (str, str) where key is file path and value is the result
     '''
     cores = cpu_count()
-    func = partial(get_qr_mt, string_header=string_header)
+    func = partial(get_qr_mt, string_header=string_header, binarization=binarization)
     with Pool(processes=cores) as pool:
         if verbose:
             results = list(tqdm.tqdm(pool.imap(func, files), total=len(files)))
@@ -90,7 +95,7 @@ def get_qr_for_files(files : List[str], string_header : str = '', verbose : bool
     
 
 
-def sort_directory(input_dir : str, output_dir : str, string_header : str = '', verbose : bool = False) -> List[str]:
+def sort_directory(input_dir : str, output_dir : str, string_header : str = '', verbose : bool = False, binarization : bool = False) -> List[str]:
     """
         Takes all images in a directory and sorts them by QR codes found in the images. Any
         images which are found before the first QR code will go into an "unsorted" folder in the directory.
@@ -113,7 +118,7 @@ def sort_directory(input_dir : str, output_dir : str, string_header : str = '', 
     
     if verbose:
         print('Scanning images for QR codes')
-    results = get_qr_for_files(image_paths, string_header=string_header, verbose=verbose)
+    results = get_qr_for_files(image_paths, string_header=string_header, verbose=verbose, binarization=binarization)
     os.makedirs(output_dir, exist_ok=True)
 
 

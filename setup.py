@@ -16,7 +16,8 @@ setup(
         'pillow',
         'reportlab',
         'qrcode',
-        'tqdm'
+        'tqdm',
+        'opencv-python'
     ],
     license='LICENSE'
 )
