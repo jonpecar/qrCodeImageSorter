@@ -5,10 +5,6 @@ from qr_image_indexer.write_pdf import build_pdf_report
 
 import argparse
 
-IM_PATH = r'C:\Users\Jonat\repos\qrCodeImageSorter\test_images'
-IM_PATH_OUT = r'C:\Users\Jonat\repos\qrCodeImageSorter\test_images_out'
-TEXT_FILE = r'C:\Users\Jonat\repos\qrCodeImageSorter\demo_list.txt'
-
 def main():
     parser = argparse.ArgumentParser()
     mutual_exclusive = parser.add_mutually_exclusive_group()
