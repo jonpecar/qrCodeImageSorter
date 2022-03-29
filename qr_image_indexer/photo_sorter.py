@@ -128,6 +128,8 @@ def sort_directory(input_dir : str, output_dir : str, string_header : str = '', 
     for image in tqdm.tqdm(images) if verbose else images:
         image_path = os.path.join(input_dir, image)
         qr_string = results[image_path]
+        if qr_string.startswith(string_header):
+            qr_string = qr_string[len(string_header):]
         if qr_string:
             current_path = os.path.join(output_dir, qr_string)
             if qr_string not in found_directories:
