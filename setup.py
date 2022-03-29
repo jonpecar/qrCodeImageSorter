@@ -6,7 +6,7 @@ setup(
         'wheel'
     ],
     name='qrImageIndexer',
-    version='0.2.0',
+    version='0.2.1',
     author='Jonathan Pecar',
     author_email='Jonathan.Pecar@gmail.com',
     description='Tool for indexing images with QR codes',
