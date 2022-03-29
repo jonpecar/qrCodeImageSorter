@@ -138,7 +138,7 @@ def remove_non_images(files : List[str], verbose : bool, non_image_dir : str) ->
         if is_image:
             new_files.append(file_path)
         elif not os.path.isdir(file_path):
-            os.makedirs(non_image_dir)
+            os.makedirs(non_image_dir, exist_ok=True)
             _, file = os.path.split(file_path)
             shutil.copyfile(file_path, os.path.join(non_image_dir, file))
     
@@ -184,9 +184,9 @@ def sort_directory(input_dir : str, output_dir : str, string_header : str = '', 
     for image_path in tqdm.tqdm(image_paths) if verbose else images:
         _, image = os.path.split(image_path)
         qr_string = results[image_path]
-        if qr_string.startswith(string_header):
-            qr_string = qr_string[len(string_header):]
         if qr_string:
+            if qr_string.startswith(string_header):
+                qr_string = qr_string[len(string_header):]
             current_path = os.path.join(output_dir, qr_string)
             if qr_string not in found_directories:
                 found_directories.append(qr_string)
