@@ -18,8 +18,8 @@ def main():
     parser.add_argument('-r', '--repeat-table-headings', help='Repeat table headings on every line',
             action='store_true')
 
-    parser.add_argument('-b', '--use-binarization', help='Search for QR codes with binarized images. May take up to twice as long but can sometimes find QR codes that would otherwise not be detected.',
-        action='store_true')
+    # parser.add_argument('-b', '--use-binarization', help='Search for QR codes with binarized images. May take up to twice as long but can sometimes find QR codes that would otherwise not be detected.',
+    #     action='store_true')
 
     parser.add_argument('-p', '--string-prefix', help='Specify a prefix for use in the generated QR codes to differentiate from codes that might also end up in photos')
 
@@ -57,7 +57,7 @@ def main():
         if verbose:
             print('Sorting from: ' + input + ', to : ' + output)
 
-        found_dirs = sort_directory(input, output, string_header, args.verbose, args.use_binarization)
+        found_dirs = sort_directory(input, output, string_header, args.verbose, True)
 
         if verbose:
             print('Found directories from images:')
