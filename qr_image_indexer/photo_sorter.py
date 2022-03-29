@@ -6,6 +6,7 @@ import os
 import shutil
 from functools import partial
 import tqdm
+import imghdr
 
 def read_qr_zbar(image_path : str, binarization : bool = False) -> List:
     """
@@ -92,6 +93,58 @@ def get_qr_for_files(files : List[str], string_header : str = '', verbose : bool
 
     return results_dict
 
+def check_if_image(file_path : str) -> Tuple[bool, str]:
+    '''
+        Function to check if a file is an image. If the file is an image it will return True and the filepath,
+        if it is not an image it will return False and the filepath.
+
+        Arguments:
+            file_path: path to item in question
+
+        Returns:
+            tuple of boolean and string indicating whether it is am image or not and the filepath of the associated check
+    '''
+    try:
+        if imghdr.what(file_path):
+            return (True, file_path)
+    except:
+        return (False, file_path)
+    return (False, file_path)
+
+def remove_non_images(files : List[str], verbose : bool, non_image_dir : str) -> List[str]:
+    '''
+        Function to remove items from the file list if they are not images. Non images files will be
+        copied to the non-image directory so it is clear to the user what has happened with them.
+
+        Parameters:
+            files: list of files to check for image-ness
+            verbose: indicates whether to provide verbose output to the user
+            non_image_dir: directory to copy non-image files to for use feedback
+
+        Returns:
+            List of all files which are images
+    '''
+    if verbose:
+        print("Checking for non-image files in the sorting directory. If any exist these will be saved to: " + non_image_dir)
+    cores = cpu_count()
+    with Pool(processes=cores) as pool:
+        if verbose:
+            results = list(tqdm.tqdm(pool.imap(check_if_image, files), total=len(files)))
+        else:
+            results = pool.map(check_if_image, files)
+
+    new_files = []
+    for is_image, file_path in results:
+        if is_image:
+            new_files.append(file_path)
+        elif not os.path.isdir(file_path):
+            os.makedirs(non_image_dir)
+            _, file = os.path.split(file_path)
+            shutil.copyfile(file_path, os.path.join(non_image_dir, file))
+    
+    return new_files
+
+
     
 
 
@@ -116,6 +169,9 @@ def sort_directory(input_dir : str, output_dir : str, string_header : str = '', 
     images = os.listdir(input_dir)
     image_paths = [os.path.join(input_dir, x) for x in images]
     
+    non_image_dir = os.path.join(output_dir, 'non_image_files')
+    image_paths = remove_non_images(image_paths, verbose, non_image_dir)
+
     if verbose:
         print('Scanning images for QR codes')
     results = get_qr_for_files(image_paths, string_header=string_header, verbose=verbose, binarization=binarization)
@@ -125,8 +181,8 @@ def sort_directory(input_dir : str, output_dir : str, string_header : str = '', 
     if verbose:
         print('Sorting image files')
     current_path = os.path.join(output_dir, 'unsorted')
-    for image in tqdm.tqdm(images) if verbose else images:
-        image_path = os.path.join(input_dir, image)
+    for image_path in tqdm.tqdm(image_paths) if verbose else images:
+        _, image = os.path.split(image_path)
         qr_string = results[image_path]
         if qr_string.startswith(string_header):
             qr_string = qr_string[len(string_header):]
