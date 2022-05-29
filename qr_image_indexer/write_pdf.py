@@ -11,7 +11,9 @@ from PIL.Image import Image as pImage
 import os
 
 MARGINS = 20
+TABLE_PADDING = 5 * mm
 MAX_QR_HEIGHT = 40 * mm
+ROW_HEIGHT = TABLE_PADDING + MAX_QR_HEIGHT
 PAGE_SIZE = A4
 
 #We will just create some fonts and set some fixed styles which will be used for the report. No dynamic styles at this stage
@@ -72,7 +74,7 @@ def build_table(data_table : List[List[object]]) -> Table:
         for item in row:
             if isinstance(item, Image):
                 item._restrictSize(col_width, MAX_QR_HEIGHT)
-    table = Table(data_table, [col_width] * col_count)
+    table = Table(data_table, [col_width] * col_count, ROW_HEIGHT)
     table.setStyle(
         TableStyle(
             [
@@ -150,13 +152,14 @@ def build_report_sliceable(data_table : List[List[object]]) -> List:
     page_height = PAGE_SIZE[1]
     avail_height = page_height - (MARGINS * 2)
     elements = []
-    qr_per_page : int = page_height // MAX_QR_HEIGHT
-
-    for page in range(len(data_table)//qr_per_page + 1):
+    qr_per_page : int = int(avail_height // ROW_HEIGHT)
+    page_count = len(data_table)//qr_per_page + 1
+    for page in range(page_count):
         page_table : List[List[object]] = []
         for line in range(qr_per_page):
-            index = page + line * qr_per_page
-            page_table.append(data_table[index])
+            index = page + line * page_count
+            if index < len(data_table):
+                page_table.append(data_table[index])
         table = build_table(page_table)
         elements.append(table)
         elements.append(PageBreak())
