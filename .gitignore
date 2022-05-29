@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 qr_source/__pycache__/qr_generator.cpython-39.pyc
 qr_source/__pycache__/write_pdf.cpython-39.pyc
+demo_list.txt

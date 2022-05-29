@@ -2,7 +2,7 @@ from re import template
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4, mm
 from reportlab.lib.styles import ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image, Paragraph
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Image, Paragraph, PageBreak
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from typing import Dict, List
@@ -11,7 +11,10 @@ from PIL.Image import Image as pImage
 import os
 
 MARGINS = 20
+TABLE_PADDING = 5 * mm
 MAX_QR_HEIGHT = 40 * mm
+ROW_HEIGHT = TABLE_PADDING + MAX_QR_HEIGHT
+PAGE_SIZE = A4
 
 #We will just create some fonts and set some fixed styles which will be used for the report. No dynamic styles at this stage
 
@@ -30,7 +33,7 @@ BOLD_STYLE = ParagraphStyle('boldText',
                             fontSize=20,
                             leading=20)
 
-def build_pdf_report(data_struct : Dict, path : str, repeat_headings : bool = False):
+def build_pdf_report(data_struct : Dict, path : str, repeat_headings : bool = False, order_for_slicing : bool = False):
     """
         Builds and saves a PDF document including QR codes and headings
 
@@ -48,16 +51,30 @@ def build_pdf_report(data_struct : Dict, path : str, repeat_headings : bool = Fa
 
     temp_files = []
     data = build_data_table(data_struct, temp_files, repeat_headings)
-    col_count = len(data[0])
-    page_width = A4[0]
+
+    if order_for_slicing:
+        elements = build_report_sliceable(data)
+    else:
+        elements = build_report_linear(data)
+    doc.build(elements)
+    return temp_files
+
+def build_report_linear(data) -> List:
+    elements = []
+    table = build_table(data)
+    elements.append(table)
+    return elements
+
+def build_table(data_table : List[List[object]]) -> Table:
+    col_count = len(data_table[0])
+    page_width = PAGE_SIZE[0]
     avail_width = page_width - (MARGINS * 2)
     col_width = avail_width/col_count
-    for row in data:
+    for row in data_table:
         for item in row:
             if isinstance(item, Image):
                 item._restrictSize(col_width, MAX_QR_HEIGHT)
-    elements = []
-    table = Table(data, [col_width] * col_count)
+    table = Table(data_table, [col_width] * col_count, ROW_HEIGHT)
     table.setStyle(
         TableStyle(
             [
@@ -71,16 +88,11 @@ def build_pdf_report(data_struct : Dict, path : str, repeat_headings : bool = Fa
             ]
         )
     )
-    elements.append(table)
-    doc.build(elements)
-    return temp_files
-        
+    return table
 
 def build_data_table(data_struct : Dict, temp_files : List, pass_headings : bool = False,
         table : List = [], indent_count : int = 0, passed_headings : List = []) -> List[List[object]]:
     """
-    Builds a table out of the provided data structure. Does not yet add in images, but will later.
-
     Arguments:
         data_struct: Data structure from qr_generator code
         temp_files: List of temp files which will be passed out to host process for clean up
@@ -134,3 +146,22 @@ def build_data_table(data_struct : Dict, temp_files : List, pass_headings : bool
             while len(row) < max_cols:
                 row.insert(-1, '')
     return table
+
+
+def build_report_sliceable(data_table : List[List[object]]) -> List:
+    page_height = PAGE_SIZE[1]
+    avail_height = page_height - (MARGINS * 2)
+    elements = []
+    qr_per_page : int = int(avail_height // ROW_HEIGHT)
+    page_count = len(data_table)//qr_per_page + 1
+    for page in range(page_count):
+        page_table : List[List[object]] = []
+        for line in range(qr_per_page):
+            index = page + line * page_count
+            if index < len(data_table):
+                page_table.append(data_table[index])
+        table = build_table(page_table)
+        elements.append(table)
+        elements.append(PageBreak())
+
+    return elements

@@ -1,3 +1,4 @@
+from sympy import true
 from qr_image_indexer.qr_generator import load_text_file
 from qr_image_indexer.qr_generator import print_struct_outline
 from qr_image_indexer.photo_sorter import sort_directory
@@ -12,6 +13,8 @@ def main():
             nargs=2, metavar=('INPUT_TEXT_FILE','OUTPUT_PDF'))
     mutual_exclusive.add_argument('-s', '--sort-photos', help='Sort photos based on QR codes found in photos. Once a QR code is found all photos will be sorted into the directory indicated by the code until subsequent codes found',
             nargs=2, metavar=('INPUT_DIR', 'OUTPUT_DIR'))
+    parser.add_argument('--pdf-type', help='Type of PDF to generate. Either linearly sorted or sorted to enable easy slicing of the printed pages. Accepts "linear" or "sliceable". Linear will sort down page, sliceable will sort "through" the page.',
+            nargs=1, metavar=('SORT_TYPE'), choices=['linear', 'sliceable'])
 
     parser.add_argument('-q', '--qr-for-headings', help='Generate a QR code for each heading, not just a code for the last items in a tree.',
             action='store_true')
@@ -40,6 +43,10 @@ def main():
         input = args.generate_pdf[0]
         output = args.generate_pdf[1]
 
+        sliceable = False
+        if args.pdf_type:
+            sliceable = args.pdf_type[0] == 'sliceable'
+
         data_struct = load_text_file(input, args.qr_for_headings, string_header)
         if verbose:
             print('Loaded text file: ' + input)
@@ -47,7 +54,7 @@ def main():
             print('Read data structure: ')
             print_struct_outline(data_struct)
 
-        build_pdf_report(data_struct, output, args.repeat_table_headings)
+        build_pdf_report(data_struct, output, args.repeat_table_headings, sliceable)
         if verbose:
             print('Saved pdf: ' + output)
     if args.sort_photos:
