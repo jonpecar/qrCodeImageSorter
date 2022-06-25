@@ -1,4 +1,3 @@
-from sympy import true
 from qr_image_indexer.qr_generator import load_text_file
 from qr_image_indexer.qr_generator import print_struct_outline
 from qr_image_indexer.photo_sorter import sort_directory
