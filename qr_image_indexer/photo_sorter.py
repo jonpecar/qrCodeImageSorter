@@ -7,6 +7,7 @@ import shutil
 from functools import partial
 import tqdm
 import imghdr
+import re
 
 def read_qr_zbar(image_path : str, binarization : bool = False) -> List:
     """
@@ -92,6 +93,17 @@ def get_qr_for_files(files : List[str], string_header : str = '', verbose : bool
         results_dict[item[0]] = item[1]
 
     return results_dict
+
+def sanitise_path(path : str):
+    drive_designator_pos = path.find(':\\') + 2
+    if drive_designator_pos > 0: #For windows with :\ in the tart of the path
+        windows_drive_designator = path[:drive_designator_pos]
+        remainder_path = path[drive_designator_pos:]
+    else: #If windows drive designator not present (e.g. on Linux or with relative pathing)
+        windows_drive_designator = ''
+        remainder_path = path
+    remainder_path = re.sub(r'[^\w\-_\. \\\/]', '_', remainder_path)
+    return windows_drive_designator + remainder_path
 
 def check_if_image(file_path : str) -> Tuple[bool, str]:
     '''
