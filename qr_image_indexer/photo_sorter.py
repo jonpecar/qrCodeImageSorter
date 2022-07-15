@@ -94,7 +94,17 @@ def get_qr_for_files(files : List[str], string_header : str = '', verbose : bool
 
     return results_dict
 
-def sanitise_path(path : str):
+def sanitise_path(path : str) -> str:
+    '''
+        Function to remove invalid path characters from a path. Will prevent failure if user uses
+        characters such as question marks in image strings.
+
+        Arguments:
+            path: path to sanitise
+
+        Returns:
+            sanitised path
+    '''
     drive_designator_pos = path.find(':\\') + 2
     if drive_designator_pos > 0: #For windows with :\ in the tart of the path
         windows_drive_designator = path[:drive_designator_pos]
@@ -157,7 +167,24 @@ def remove_non_images(files : List[str], verbose : bool, non_image_dir : str) ->
     return new_files
 
 
+
+def get_image_paths(input_dir : str,  non_image_dir : str, verbose : bool = False) -> List[str]:
+    """
+        Gets all images in the provided input directory. Will exclude non-image files.
+
+        Parameters:
+            input_dir: Path to input directory containing photos as a string
+            non_image_dir: Path to copy non-image files to
+            verbose: Boolean indicating whether to print status information to command line
+
+        Returns:
+            List[str] of all iamge paths
+    """
+    images = os.listdir(input_dir)
+    image_paths = [os.path.join(input_dir, x) for x in images]
     
+    image_paths = remove_non_images(image_paths, verbose, non_image_dir)
+    return image_paths
 
 
 def sort_directory(input_dir : str, output_dir : str, string_header : str = '', verbose : bool = False, binarization : bool = False) -> List[str]:
@@ -178,11 +205,9 @@ def sort_directory(input_dir : str, output_dir : str, string_header : str = '', 
 
     found_directories = []
 
-    images = os.listdir(input_dir)
-    image_paths = [os.path.join(input_dir, x) for x in images]
-    
     non_image_dir = os.path.join(output_dir, 'non_image_files')
-    image_paths = remove_non_images(image_paths, verbose, non_image_dir)
+
+    image_paths = get_image_paths(input_dir, non_image_dir, verbose)
 
     if verbose:
         print('Scanning images for QR codes')
@@ -193,12 +218,13 @@ def sort_directory(input_dir : str, output_dir : str, string_header : str = '', 
     if verbose:
         print('Sorting image files')
     current_path = os.path.join(output_dir, 'unsorted')
-    for image_path in tqdm.tqdm(image_paths) if verbose else images:
+    for image_path in tqdm.tqdm(image_paths) if verbose else image_paths:
         _, image = os.path.split(image_path)
         qr_string = results[image_path]
         if qr_string:
             if qr_string.startswith(string_header):
                 qr_string = qr_string[len(string_header):]
+            qr_string = sanitise_path(qr_string)
             current_path = os.path.join(output_dir, qr_string)
             if qr_string not in found_directories:
                 found_directories.append(qr_string)
