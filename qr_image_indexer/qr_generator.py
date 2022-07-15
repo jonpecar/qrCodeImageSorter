@@ -32,7 +32,7 @@ def load_text_file(path : str, qr_headers : bool = False, string_header : str = 
         Returns:
             Dictionary data structure where Key is the heading for the level and data is a tuple containing
                 a nested dictionary of the same structure in position 0 and QR code image in position 1. These
-                will be None if neither are required
+                will be None if either are not required
     """
     output_data_structure = {}
     with open(path, 'r') as f:
@@ -46,7 +46,8 @@ def load_text_file(path : str, qr_headers : bool = False, string_header : str = 
 def unpack_file(data : List[str], qr_headers : bool, data_structure : Dict[str, Tuple[Dict, Image.Image]],
     index : int = 0, previous_levels : str = '') -> int:
     """
-    Function to unpack a tabulated text file where items are grouped by tab depth.
+    Function to unpack a tabulated text file where items are grouped by tab depth. Called recursively for each loweer level of
+    the data structure.
 
     Inputs:
         data - List of string representing data
