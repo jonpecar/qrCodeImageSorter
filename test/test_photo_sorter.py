@@ -96,6 +96,24 @@ def test_is_image_false(tmp_path : pathlib.Path):
     assert not photo_sorter.check_if_image(temp_file.as_posix())[0] 
 
 def test_remove_non_images(tmp_path : pathlib.Path):
+    files = []
+    
+    non_image_dir = tmp_path/'non_image'
+    non_image_dir.mkdir()
+
+    im_path = generate_image(tmp_path, 'test')
+    files.append(im_path)
+    non_image_file = tmp_path/'non_image_file'
+    non_image_file.touch()
+    files.append(non_image_file.as_posix())
+
+    results = photo_sorter.remove_non_images(files, False, non_image_dir.as_posix())
+
+    assert len(results) == 1
+    assert results[0] == im_path
+    assert os.listdir(non_image_dir) == ['non_image_file']
+
+def test_get_images(tmp_path : pathlib.Path):    
     non_image_dir = tmp_path/'non_image'
     non_image_dir.mkdir()
 
@@ -103,10 +121,10 @@ def test_remove_non_images(tmp_path : pathlib.Path):
     non_image_file = tmp_path/'non_image_file'
     non_image_file.touch()
 
-    results = photo_sorter.remove_non_images(tmp_path.as_posix(), False, non_image_dir.as_posix())
+    results = photo_sorter.get_image_paths(tmp_path.as_posix(), non_image_dir.as_posix())
 
     assert len(results) == 1
-    assert results[0] == im_path
+    assert results[0].replace('\\','/') == im_path # Since using os.join this will end up with Windows pathing in Windows - still OK
     assert os.listdir(non_image_dir) == ['non_image_file']
 
 def test_qr_sorting(tmp_path : pathlib.Path):
