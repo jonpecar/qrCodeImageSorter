@@ -1,0 +1,6 @@
+pyzbar
+pillow
+reportlab
+qrcode
+tqdm
+opencv-python
