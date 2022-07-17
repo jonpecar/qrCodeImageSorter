@@ -31,7 +31,7 @@ dev = ["pytest", "bumpver", "setuptools"]
 [project.urls]
 Homepage = "https://github.com/jonpecar/qrCodeImageSorter"
 [tool.bumpver]
-current_version = "0.3.1"
+current_version = "0.3.2"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
@@ -42,7 +42,7 @@ push = true
 "pyproject.toml" = [
     'current_version = "{version}"',
 ]
-"README.md" = [
+"__init__.py" = [
     "{version}",
     "{pep440_version}",
 ]
