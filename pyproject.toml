@@ -5,6 +5,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "qrImageIndexer"
+version = "0.3.2"
 description = "Tool for indexing images with QR codes"
 readme = "README.md"
 authors = [{name = "Jonathan Pecar", email = "jonathan.pecar@gmail.com"}]
@@ -40,6 +41,7 @@ push = true
 [tool.bumpver.file_patterns]
 "pyproject.toml" = [
     'current_version = "{version}"',
+    'version = "{version}",
 ]
 "qr_image_indexer/__init__.py" = [
     '__version__ = "{version}"',
