@@ -26,7 +26,7 @@ dependencies = [
 ]
 requires-python = ">=3.6"
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["pytest", "bumpver", "setuptools"]
 
 [project.urls]
 Homepage = "https://github.com/jonpecar/qrCodeImageSorter"
