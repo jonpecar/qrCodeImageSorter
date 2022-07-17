@@ -37,6 +37,11 @@ def test_path_sanitise_unlcean():
     expected_path_unix = r'/usr/test_path/test_invalid/Chars_'
     assert photo_sorter.sanitise_path(test_path_unix) == expected_path_unix
 
+''' 
+    Acknowledge that this uses the image generation as an input and image generation uses this as a test,
+    but it is vanishingly unlikely that zbar reads the QR code in the exactly incorrect way that the qr
+    library generates it. Also assuming external libraries are OK.
+'''
 def test_read_qr_zbar(tmp_path : pathlib.Path):
     assert photo_sorter.read_qr_zbar(generate_image(tmp_path, 'test_string'))[0].data.decode('utf-8') == 'test_string'
     assert photo_sorter.read_qr_zbar(generate_image(tmp_path, 'test_string'))[0].data.decode('utf-8') == photo_sorter.read_qr_zbar(generate_image(tmp_path, 'test_string'), binarization=True)[0].data.decode('utf-8')
