@@ -5,7 +5,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "qrImageIndexer"
-version = "0.3.1"
 description = "Tool for indexing images with QR codes"
 readme = "README.md"
 authors = [{name = "Jonathan Pecar", email = "jonathan.pecar@gmail.com"}]
@@ -31,7 +30,7 @@ dev = ["pytest", "bumpver", "setuptools"]
 [project.urls]
 Homepage = "https://github.com/jonpecar/qrCodeImageSorter"
 [tool.bumpver]
-current_version = "0.3.2"
+current_version = "0.3.1"
 version_pattern = "MAJOR.MINOR.PATCH"
 commit_message = "bump version {old_version} -> {new_version}"
 commit = true
@@ -42,8 +41,7 @@ push = true
 "pyproject.toml" = [
     'current_version = "{version}"',
 ]
-"__init__.py" = [
-    "{version}",
-    "{pep440_version}",
+"qr_image_indexer/__init__.py" = [
+    '__version__ = "{version}"',
 ]
 
