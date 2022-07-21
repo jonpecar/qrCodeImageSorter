@@ -21,7 +21,7 @@ def build_qr(data : str) -> Image.Image:
     qr.make(fit=True)
     return qr.make_image(fill_color='black', back_color='white')
 
-def load_text_file(path : str, qr_headers : bool = False, string_header : str = '') -> List[List[str]]:
+def load_text_file(path : str) -> List[List[str]]:
     """
         Builds a data structure from a text file
 
@@ -33,15 +33,25 @@ def load_text_file(path : str, qr_headers : bool = False, string_header : str = 
         Returns:
             List of list for table-like file (e.g. CSV)
     """
-    output_data_structure = {}
+    output_data_structure = []
     with open(path, 'r') as f:
-        data = f.readlines()
-        data = [x.rstrip() for x in data]
-    
+        csv = reader(f , delimiter='\t')
+        for row in csv:
+            output_data_structure.append(row)
+
     return output_data_structure
 
+def generate_qr_code_structure(data_structure : Dict[str, Tuple[Dict, str]]) -> Dict[str, Tuple[Dict, Image.Image]]:
+    result = {}
+    for key in data_structure:
+        image = None
+        if data_structure[key][1]:
+            image = build_qr(data_structure[key][1])
+        sub_struct = generate_qr_code_structure(data_structure[key][0])
+        result[key] = (sub_struct, image)
+    return result
 
-def unpack_data(data : List[str], qr_headers : bool, data_structure : Dict[str, Tuple[Dict, Image.Image]],
+def unpack_data(data : List[List[str]], gen_qr_headings : bool, data_structure : Dict[str, Tuple[Dict, str]], string_header : str = '',
     index : int = 0, previous_levels : str = '') -> int:
     """
     Function to unpack a tabulated text file where items are grouped by tab depth. Called recursively for each loweer level of
@@ -49,61 +59,60 @@ def unpack_data(data : List[str], qr_headers : bool, data_structure : Dict[str, 
 
     Inputs:
         data - List of string representing data
-        qr_headers - Boolean indicating if QR codes are to be built for headers or just for final elements
-        data_structure - Dictionary where output data is to be stored. This will be altered by the function. Output dictionary will contain
-            key of str and data in a touple of (Dict, Image) where the Dict is the data structure for subsequent levels of the file and the
-            image is the QR code where relevent
+        gen_qr_headings - Boolean indicating if QR codes are to be built for headings or just for final elements
+        data_structure - List where output data is to be stored. This will be altered by the function. Output dictionary will contain
+            key of str and string for image in a touple of (Dict, str) where the Dict is the data structure for subsequent levels of the file and the
+            str is the content for the QR code where relevent
+        string_header - String to include as header for all QR code values to help distinguish from general QR codes
         index - Index to start at. Defaults to zero but non-zero values used for recursion
         previous_levels - String representing the folder paths represented by previous levels of the data structure. This is embedded in the QR
             code for sorting
 
+
     Returns:
         index - integer representing current index of the process
+
         
     """
     #Determine target indent from first entry. All subsequent should be the same.
-    target_indent = count_leading_tabs(data[index])
+    target_indent = count_leading_indent(data[index])
     while index < len(data):
 
         # Check if this index is less indented than the target. If so we need to return a level.
-        if count_leading_tabs(data[index]) < target_indent:
+        if count_leading_indent(data[index]) < target_indent:
             return index
 
         # Get some data for this iteration
-        raw_line = data[index].strip()
+        raw_line = data[index][target_indent]
         next_data_struct = {}
         next_level_str = previous_levels + raw_line + path.sep
 
-        # If at the last index and the entry does not already exist, then just create the entry and exit the function, returning
-        # an incremented index which will cause the while loop to terminate for all remaining iterations.
-        if index == (len(data) - 1) and not raw_line in data_structure:
-            image = build_qr(next_level_str)
-            data_structure[raw_line] = (next_data_struct, image)
-            return index + 1
-
-        # Get the difference between the current indent and next indent levels
-        indent_diff = target_indent - count_leading_tabs(data[index + 1])
+        # Get the difference between the current indent and next indent levels. If no further lines, then indent diff of zero
+        if index == (len(data) - 1):
+            indent_diff = 0
+        else:
+            indent_diff = target_indent - count_leading_indent(data[index + 1])
 
         # If for whatever reason the entry already exists then get the existing dictionary to pass to the next level in
         if raw_line in data_structure:
             next_data_struct = data_structure[raw_line][0]
         else:
-            image = None
-            if qr_headers or indent_diff >= 0:
-                image = build_qr(next_level_str)
-            data_structure[raw_line] = (next_data_struct, image)
+            image_str = None
+            if gen_qr_headings or indent_diff >= 0:
+                image_str = string_header + next_level_str
+            data_structure[raw_line] = (next_data_struct, image_str)
 
         # Check if the next line is further indented or if it is less indented. If more indented then recursively call function.
         # Otherwise increment
         if indent_diff < 0:
-            index = unpack_data(data, qr_headers, next_data_struct, index + 1, next_level_str)
+            index = unpack_data(data, gen_qr_headings, next_data_struct, string_header, index + 1, next_level_str)
         else:
             index += 1
 
         
     return index
 
-def count_leading_tabs(line : str) -> int:
+def count_leading_indent(line : List[str]) -> int:
     """
         Counts leacding tabs in a passed string. Will convert sets of 4 spaces to a tab
 
@@ -112,8 +121,10 @@ def count_leading_tabs(line : str) -> int:
 
         Returns integer with number of tabs
     """
-    line = line.replace(' ' * 4, '\t')
-    return (len(line) - len(line.lstrip('\t')))
+    for i in range(len(line)):
+        if line[i] != '':
+            return i
+    return len(line)
 
 def print_struct_outline(data_structure : Dict, indent_level : int = 0):
     """
