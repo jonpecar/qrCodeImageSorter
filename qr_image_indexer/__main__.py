@@ -1,5 +1,4 @@
-from qr_image_indexer.qr_generator import load_text_file
-from qr_image_indexer.qr_generator import print_struct_outline
+from qr_image_indexer.qr_generator import load_text_file, print_struct_outline, unpack_data, generate_qr_code_structure
 from qr_image_indexer.photo_sorter import sort_directory
 from qr_image_indexer.write_pdf import build_pdf_report
 
@@ -46,14 +45,19 @@ def main():
         if args.pdf_type:
             sliceable = args.pdf_type[0] == 'sliceable'
 
-        data_struct = load_text_file(input, args.qr_for_headings, string_header)
+        text_data = load_text_file(input)
+
+        data_struct = {}
+        unpack_data(text_data, args.qr_for_headings, data_struct, string_header)
+        image_struct = generate_qr_code_structure(data_struct)
+        
         if verbose:
             print('Loaded text file: ' + input)
             print('')
             print('Read data structure: ')
-            print_struct_outline(data_struct)
+            print_struct_outline(image_struct)
 
-        build_pdf_report(data_struct, output, args.repeat_table_headings, sliceable)
+        build_pdf_report(image_struct, output, args.repeat_table_headings, sliceable)
         if verbose:
             print('Saved pdf: ' + output)
     if args.sort_photos:
