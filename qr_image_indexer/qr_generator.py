@@ -4,6 +4,7 @@ import qrcode
 from PIL import Image
 from typing import Dict, List, Tuple
 from os import path
+from csv import reader
 
 def build_qr(data : str) -> Image.Image:
     """
@@ -20,7 +21,7 @@ def build_qr(data : str) -> Image.Image:
     qr.make(fit=True)
     return qr.make_image(fill_color='black', back_color='white')
 
-def load_text_file(path : str, qr_headers : bool = False, string_header : str = '') -> Dict[str, Tuple[Dict, Image.Image]]:
+def load_text_file(path : str, qr_headers : bool = False, string_header : str = '') -> List[List[str]]:
     """
         Builds a data structure from a text file
 
@@ -30,20 +31,17 @@ def load_text_file(path : str, qr_headers : bool = False, string_header : str = 
             string_header: string to be set at the start of QR code data to help weed out other QR codes
 
         Returns:
-            Dictionary data structure where Key is the heading for the level and data is a tuple containing
-                a nested dictionary of the same structure in position 0 and QR code image in position 1. These
-                will be None if either are not required
+            List of list for table-like file (e.g. CSV)
     """
     output_data_structure = {}
     with open(path, 'r') as f:
         data = f.readlines()
         data = [x.rstrip() for x in data]
-        unpack_file(data, qr_headers, output_data_structure, previous_levels=string_header)
     
     return output_data_structure
 
 
-def unpack_file(data : List[str], qr_headers : bool, data_structure : Dict[str, Tuple[Dict, Image.Image]],
+def unpack_data(data : List[str], qr_headers : bool, data_structure : Dict[str, Tuple[Dict, Image.Image]],
     index : int = 0, previous_levels : str = '') -> int:
     """
     Function to unpack a tabulated text file where items are grouped by tab depth. Called recursively for each loweer level of
@@ -98,7 +96,7 @@ def unpack_file(data : List[str], qr_headers : bool, data_structure : Dict[str, 
         # Check if the next line is further indented or if it is less indented. If more indented then recursively call function.
         # Otherwise increment
         if indent_diff < 0:
-            index = unpack_file(data, qr_headers, next_data_struct, index + 1, next_level_str)
+            index = unpack_data(data, qr_headers, next_data_struct, index + 1, next_level_str)
         else:
             index += 1
 
