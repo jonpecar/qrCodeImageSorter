@@ -14,6 +14,15 @@ Level1-2
     with open(file_path, 'w') as f:
         f.write(content)
 
+def build_demo_tsv_four_spaces(file_path : pathlib.Path):
+    content = '''Level1-1
+Level1-2
+    Level2-1
+    Level2-2
+        Level3'''
+    with open(file_path, 'w') as f:
+        f.write(content)
+
 
 def demo_tsv_expected_data():
     data = []
@@ -85,6 +94,12 @@ Level1-2
 def test_load_text_file(tmp_path : pathlib.Path):
     demo_file = tmp_path / 'file.txt'
     build_demo_tsv(demo_file)
+    loaded_data = qr_generator.load_text_file(demo_file.as_posix())
+    assert demo_tsv_expected_data() == loaded_data
+
+def test_load_text_file_spaces(tmp_path : pathlib.Path):
+    demo_file = tmp_path / 'file.txt'
+    build_demo_tsv_four_spaces(demo_file)
     loaded_data = qr_generator.load_text_file(demo_file.as_posix())
     assert demo_tsv_expected_data() == loaded_data
 

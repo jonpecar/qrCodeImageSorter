@@ -35,13 +35,26 @@ def load_text_file(path : str) -> List[List[str]]:
     """
     output_data_structure = []
     with open(path, 'r') as f:
-        csv = reader(f , delimiter='\t')
+        lines = []
+        for row in f:
+            lines.append(row.replace('    ', '\t'))
+        csv = reader(lines , delimiter='\t')
         for row in csv:
             output_data_structure.append(row)
 
     return output_data_structure
 
 def generate_qr_code_structure(data_structure : Dict[str, Tuple[Dict, str]]) -> Dict[str, Tuple[Dict, Image.Image]]:
+    '''
+        Converts a dictionary containing the QR code string into a dictionary with an Image in place of the string
+
+        Parameters:
+            data_structure: Data structure in format of dictionary with tuple containing a like dictionary and a string
+            where the string is the data to be embedded in the QR code. If no QR code required string to be None
+
+        Returns:
+            Similar structure to input but with string replaced by an PIL image
+    '''
     result = {}
     for key in data_structure:
         image = None
