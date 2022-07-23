@@ -1,9 +1,8 @@
-from cv2 import detail_FeaturesMatcher
 from fpdf import FPDF
 from typing import Dict, List, Tuple
 from PIL.Image import Image
 from qrcode.image.pil import PilImage
-from math import floor, ceil
+from math import ceil
 from copy import copy
 import io
 
