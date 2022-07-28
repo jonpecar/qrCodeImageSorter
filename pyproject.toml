@@ -39,11 +39,11 @@ tag = true
 push = true
 
 [tool.bumpver.file_patterns]
-"pyproject.toml" = [
+'pyproject.toml' = [
     'current_version = "{version}"',
     'version = "{version}"',
 ]
-"qr_image_indexer/__init__.py" = [
+'qr_image_indexer/__init__.py' = [
     '__version__ = "{version}"',
 ]
 
