@@ -1,6 +1,6 @@
 from qr_image_indexer.qr_generator import load_text_file, print_struct_outline, unpack_data, generate_qr_code_structure
 from qr_image_indexer.photo_sorter import sort_directory
-from qr_image_indexer.write_pdf import build_pdf_report
+from qr_image_indexer.write_pdf_fpf2 import build_pdf_report
 
 import argparse
 

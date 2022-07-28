@@ -1,6 +1,6 @@
 pyzbar
 pillow
-reportlab
+fpdf2
 qrcode
 tqdm
 opencv-python
