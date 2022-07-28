@@ -1,4 +1,4 @@
-import write_pdf_fpf2
+from qr_image_indexer import write_pdf_fpf2
 from .test_qr_generator import demo_data_struct_include_headers
 from os import path
 
