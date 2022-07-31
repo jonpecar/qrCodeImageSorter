@@ -104,8 +104,9 @@ and may be a good first issue for anyone who wishes to contribute.** An example 
 
 ```
 Line 1
-    Line 1 1st indent
+    Line 1 1st indent item 1
         Line 1 2nd indent
+    Line 1 1st indent item 2
 Line 2
 Line 3
 Line 4
@@ -113,14 +114,13 @@ Line 5
 Line 6
 ```
 
-In this case photos under `Line 1 1st indent` would appear in the directory `Line 1/Line 1 1st indent/` and photos under `Line 1 2nd
-indent` will appear in the directory `Line 1/Line 1 1st indent/Line 1 2nd indent/`.
+In this case photos under `Line 1 1st indent item 1` would appear in the directory `Line 1/Line 1 1st indent item 1/` and photos under `Line 1 2nd
+indent` will appear in the directory `Line 1/Line 1 1st indent item 1/Line 1 2nd indent/`.
 
 Generally it is recommended that folder structure be used to sort and plan photo capture logically. E.g. level 1 of the
 structure may be particular rooms, level 2 may be objects in the room and level 3 may be specifics about the object.
 
-There is no limit on the number of levels that may be included in the document, but higher numbers will result in messier
-outputs.
+There is no limit on the number of levels that may be included in the document, but higher numbers will result in messier/busier output PDFs.
 
 #### Other Recommended Options
 ---
