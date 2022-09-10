@@ -1,6 +1,8 @@
 from qr_image_indexer import write_pdf_fpf2
 from .test_qr_generator import demo_data_struct_include_headers
 from os import path
+import pathlib
+from PyPDF2 import PdfReader
 
 def expected_table_include_headers_strings_repeat_headings():
     expected_structure = [
@@ -78,3 +80,25 @@ def test_sort_table_for_slicing_remainder():
     ]
 
     assert expected == write_pdf_fpf2.sort_table_for_slicing(input, 3)
+
+def test_generated_pdf_text(tmp_path : pathlib.Path):
+    data_dict = {
+        'Line 1':
+            ({'Indent 1' : 
+                ({'Indent 2' : ({}, None)},
+                    None)},
+                None),
+        'Line 2': 
+            ({}, None)
+    }
+    path = tmp_path / 'test.pdf'
+    write_pdf_fpf2.build_pdf_report(data_dict, path.as_posix())
+    reader = PdfReader(path)
+    page = reader.pages[0]
+    text = page.extract_text()
+    assert 'Line 1' in text
+    assert 'Line 2' in text
+    assert 'Indent 1' in text
+    assert 'Indent 2' in text
+
+    
