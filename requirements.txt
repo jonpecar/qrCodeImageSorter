@@ -4,3 +4,4 @@ fpdf2
 qrcode
 tqdm
 opencv-python
+PyPDF2
