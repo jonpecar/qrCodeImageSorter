@@ -57,7 +57,8 @@ def main():
             print('Read data structure: ')
             print_struct_outline(image_struct)
 
-        build_pdf_report(image_struct, output, args.repeat_table_headings, sliceable)
+        pdf = build_pdf_report(image_struct, args.repeat_table_headings, sliceable)
+        pdf.output(output)
         if verbose:
             print('Saved pdf: ' + output)
     if args.sort_photos:

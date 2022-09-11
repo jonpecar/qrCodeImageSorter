@@ -8,7 +8,7 @@ import io
 
 TARGET_ROWS_PER_PAGE = 6
 
-def build_pdf_report(data_struct : Dict[str, Tuple[Dict, Image]], path: str, repeat_headings : bool = False, order_for_slicing : bool = False) -> FPDF:
+def build_pdf_report(data_struct : Dict[str, Tuple[Dict, Image]], repeat_headings : bool = False, order_for_slicing : bool = False) -> FPDF:
     '''
         Builds a PDF report using FPDF2
 
@@ -49,7 +49,7 @@ def build_pdf_report(data_struct : Dict[str, Tuple[Dict, Image]], path: str, rep
                 pdf.multi_cell(col_width, line_height, datum, border = 1,
                     new_x="RIGHT", new_y="TOP", max_line_height=pdf.font_size)
         pdf.ln(line_height)
-    pdf.output(path)
+    return pdf
 
 def build_data_table(data_struct: Dict[str, Tuple[Dict, Image]], pass_headings : bool = False, existing_data : List = []) -> List[List]:
     '''

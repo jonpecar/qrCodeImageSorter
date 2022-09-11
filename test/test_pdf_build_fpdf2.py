@@ -92,7 +92,8 @@ def test_generated_pdf_text(tmp_path : pathlib.Path):
             ({}, None)
     }
     path = tmp_path / 'test.pdf'
-    write_pdf_fpf2.build_pdf_report(data_dict, path.as_posix())
+    pdf = write_pdf_fpf2.build_pdf_report(data_dict)
+    pdf.output(path.as_posix())
     reader = PdfReader(path)
     page = reader.pages[0]
     text = page.extract_text()
