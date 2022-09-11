@@ -70,6 +70,16 @@ def demo_data_struct_no_headers_images():
     test_struct['Level1-2'][0]['Level2-2'][0]['Level3'] = ({}, qr_generator.build_qr('Level1-2' + path.sep + 'Level2-2' + path.sep + 'Level3' + path.sep))
     return test_struct
 
+def demo_load_lines_data():
+    return ["Test Line 1", "\tTest Line 2", "Test Line 3"]
+
+def expected_load_lines_data():
+    return [
+        ["Test Line 1"],
+        ["", "Test Line 2"],
+        ["Test Line 3"],
+    ]
+
 def test_build_indent_string_print():
     assert '' == qr_generator.build_indent_string_print(0)
     assert '|___' == qr_generator.build_indent_string_print(1)
@@ -90,6 +100,12 @@ Level1-2
 
     captured = capsys.readouterr()
     assert expected_out == captured.out
+
+def test_load_lines():
+    lines = demo_load_lines_data()
+    result = qr_generator.load_lines(lines)
+    assert result == expected_load_lines_data()
+    
 
 def test_load_text_file(tmp_path : pathlib.Path):
     demo_file = tmp_path / 'file.txt'

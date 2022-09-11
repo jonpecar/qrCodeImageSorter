@@ -1,3 +1,4 @@
+from doctest import OutputChecker
 from io import TextIOWrapper
 from turtle import fillcolor
 import qrcode
@@ -35,13 +36,18 @@ def load_text_file(path : str) -> List[List[str]]:
     """
     output_data_structure = []
     with open(path, 'r') as f:
-        lines = []
-        for row in f:
-            lines.append(row.replace('    ', '\t'))
-        csv = reader(lines , delimiter='\t')
-        for row in csv:
-            output_data_structure.append(row)
+        output_data_structure = load_lines(f)
 
+    return output_data_structure
+
+def load_lines(input_lines) -> List[List[str]]:
+    lines = []
+    output_data_structure = []
+    for row in input_lines:
+        lines.append(row.replace('    ', '\t'))
+    csv = reader(lines , delimiter='\t')
+    for row in csv:
+        output_data_structure.append(row)
     return output_data_structure
 
 def generate_qr_code_structure(data_structure : Dict[str, Tuple[Dict, str]]) -> Dict[str, Tuple[Dict, Image.Image]]:
