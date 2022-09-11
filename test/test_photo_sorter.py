@@ -1,5 +1,5 @@
 from os import listdir
-from qr_image_indexer import photo_sorter, qr_generator
+from qrImageIndexer import photo_sorter, qr_generator
 import pathlib
 import os
 from typing import Dict

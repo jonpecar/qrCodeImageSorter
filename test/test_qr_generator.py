@@ -1,7 +1,7 @@
 # Will not test qr generator code as it is effectively tested
 # where it is used in the sorter tests.
 import pathlib
-from qr_image_indexer import qr_generator
+from qrImageIndexer import qr_generator
 from os import path
 from PIL import ImageChops
 
