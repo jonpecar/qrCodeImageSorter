@@ -43,7 +43,7 @@ push = true
     'current_version = "{version}"',
     'version = "{version}"',
 ]
-'qr_image_indexer//__init__.py' = [
+'qrImageIndexer//__init__.py' = [
     '__version__ = "{version}"',
 ]
 
