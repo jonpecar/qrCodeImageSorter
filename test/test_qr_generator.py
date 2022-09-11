@@ -33,6 +33,25 @@ def demo_tsv_expected_data():
     data.append(['', '', 'Level3'])
     return data
 
+def demo_data_blank_line_end():
+    data = []
+    data.append(['Level1-1'])
+    data.append(['Level1-2'])
+    data.append(['', 'Level2-1'])
+    data.append(['', 'Level2-2'])
+    data.append(['', '', 'Level3'])
+    data.append([])
+    return data
+
+def demo_data_blank_line_mid():
+    data = []
+    data.append(['Level1-1'])
+    data.append([])
+    data.append(['Level1-2'])
+    data.append(['', 'Level2-1'])
+    data.append(['', 'Level2-2'])
+    data.append(['', '', 'Level3'])
+    return data
 
 def demo_data_struct_include_headers():
     test_struct = {}
@@ -119,6 +138,8 @@ def test_load_text_file_spaces(tmp_path : pathlib.Path):
     loaded_data = qr_generator.load_text_file(demo_file.as_posix())
     assert demo_tsv_expected_data() == loaded_data
 
+
+
 def test_count_leading_indent():
     data = ['non_empty_string']
     for i in range(10):
@@ -128,6 +149,18 @@ def test_count_leading_indent():
 def test_unpack_data_include_headers():
     result_struct = {}
     qr_generator.unpack_data(demo_tsv_expected_data(), True, result_struct)
+
+    assert demo_data_struct_include_headers() == result_struct
+
+def test_unpack_data_blank_line_end():
+    result_struct = {}
+    qr_generator.unpack_data(demo_data_blank_line_end(), True, result_struct)
+
+    assert demo_data_struct_include_headers() == result_struct
+
+def test_unpack_data_blank_line_mid():
+    result_struct = {}
+    qr_generator.unpack_data(demo_data_blank_line_mid(), True, result_struct)
 
     assert demo_data_struct_include_headers() == result_struct
 

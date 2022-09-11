@@ -96,7 +96,10 @@ def unpack_data(data : List[List[str]], gen_qr_headings : bool, data_structure :
     #Determine target indent from first entry. All subsequent should be the same.
     target_indent = count_leading_indent(data[index])
     while index < len(data):
-
+        # Check if the line is blank. If so we will increment to the next index and continue
+        if data[index] == []:
+            index += 1
+            continue
         # Check if this index is less indented than the target. If so we need to return a level.
         if count_leading_indent(data[index]) < target_indent:
             return index
