@@ -4,6 +4,8 @@ import pathlib
 from qrImageIndexer import qr_generator
 from os import path
 from PIL import ImageChops
+import pytest
+from unittest import mock
 
 def build_demo_tsv(file_path : pathlib.Path):
     content = '''Level1-1
@@ -148,31 +150,31 @@ def test_count_leading_indent():
 
 def test_unpack_data_include_headers():
     result_struct = {}
-    qr_generator.unpack_data(demo_tsv_expected_data(), True, result_struct)
+    qr_generator.unpack_data_recurse(demo_tsv_expected_data(), True, result_struct)
 
     assert demo_data_struct_include_headers() == result_struct
 
 def test_unpack_data_blank_line_end():
     result_struct = {}
-    qr_generator.unpack_data(demo_data_blank_line_end(), True, result_struct)
+    qr_generator.unpack_data_recurse(demo_data_blank_line_end(), True, result_struct)
 
     assert demo_data_struct_include_headers() == result_struct
 
 def test_unpack_data_blank_line_mid():
     result_struct = {}
-    qr_generator.unpack_data(demo_data_blank_line_mid(), True, result_struct)
+    qr_generator.unpack_data_recurse(demo_data_blank_line_mid(), True, result_struct)
 
     assert demo_data_struct_include_headers() == result_struct
 
 def test_unpack_data_no_headers():
     result_struct = {}
-    qr_generator.unpack_data(demo_tsv_expected_data(), False, result_struct)
+    qr_generator.unpack_data_recurse(demo_tsv_expected_data(), False, result_struct)
 
     assert demo_data_struct_no_headers() == result_struct
 
 def test_unpack_data_include_headers_QRHeader():
     result_struct = {}
-    qr_generator.unpack_data(demo_tsv_expected_data(), True, result_struct, r'{image}')
+    qr_generator.unpack_data_recurse(demo_tsv_expected_data(), True, result_struct, r'{image}')
 
     assert demo_data_struct_include_headers_with_QRHeader() == result_struct
 
@@ -183,3 +185,13 @@ def test_structure_qr_builder():
     assert not ImageChops.difference(expected_struct['Level1-2'][0]['Level2-1'][1], generated_struct['Level1-2'][0]['Level2-1'][1]).getbbox()
     assert not ImageChops.difference(expected_struct['Level1-2'][0]['Level2-2'][0]['Level3'][1], generated_struct['Level1-2'][0]['Level2-2'][0]['Level3'][1]).getbbox()
     assert expected_struct['Level1-2'][0]['Level2-2'][1] == generated_struct['Level1-2'][0]['Level2-2'][1]
+
+# def test_
+
+def mock_qr_generator_functions(mocker : mock):
+    unpack_data = mocker.patch('qrImageIndexer.qr_generator.unpack_data')
+    generate_qr_structure = mocker.patch('qrImageIndexer.qr_generator.generate_qr_code_structure')
+
+
+def test_single_func_pdf_builder():
+    assert False

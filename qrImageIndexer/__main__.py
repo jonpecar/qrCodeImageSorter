@@ -47,8 +47,7 @@ def main():
 
         text_data = load_text_file(input)
 
-        data_struct = {}
-        unpack_data(text_data, args.qr_for_headings, data_struct, string_header)
+        data_struct = unpack_data(text_data, args.qr_for_headings, string_header)
         image_struct = generate_qr_code_structure(data_struct)
         
         if verbose:

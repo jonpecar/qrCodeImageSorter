@@ -70,8 +70,12 @@ def generate_qr_code_structure(data_structure : Dict[str, Tuple[Dict, str]]) -> 
         result[key] = (sub_struct, image)
     return result
 
-def unpack_data(data : List[List[str]], gen_qr_headings : bool, data_structure : Dict[str, Tuple[Dict, str]], string_header : str = '',
-    index : int = 0, previous_levels : str = '') -> int:
+def unpack_data(data : List[List[str]], gen_qr_headings : bool, string_header : str = '') -> Dict[str, Tuple[Dict, str]]:
+    _, data_structure = unpack_data_recurse(data, gen_qr_headings, string_header=string_header)
+    return data_structure
+
+def unpack_data_recurse(data : List[List[str]], gen_qr_headings : bool, data_structure : Dict[str, Tuple[Dict, str]] = {}, string_header : str = '',
+    index : int = 0, previous_levels : str = '') -> Tuple[int, Dict[str, Tuple[Dict, str]]]:
     """
     Function to unpack a tabulated text file where items are grouped by tab depth. Called recursively for each loweer level of
     the data structure.
@@ -127,12 +131,12 @@ def unpack_data(data : List[List[str]], gen_qr_headings : bool, data_structure :
         # Check if the next line is further indented or if it is less indented. If more indented then recursively call function.
         # Otherwise increment
         if indent_diff < 0:
-            index = unpack_data(data, gen_qr_headings, next_data_struct, string_header, index + 1, next_level_str)
+            index, _ = unpack_data_recurse(data, gen_qr_headings, next_data_struct, string_header, index + 1, next_level_str)
         else:
             index += 1
 
         
-    return index
+    return index, data_structure
 
 def count_leading_indent(line : List[str]) -> int:
     """
