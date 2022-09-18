@@ -153,11 +153,25 @@ def test_unpack_data_include_headers():
 
     assert demo_data_struct_include_headers() == result_struct
 
+def test_unpack_data_include_headers_recurse_equivalence():
+    result_struct_1 = {}
+    qr_generator.unpack_data_recurse(demo_tsv_expected_data(), True, result_struct_1)
+    result_struct_2 = qr_generator.unpack_data(demo_tsv_expected_data(), True)
+
+    assert result_struct_1 == result_struct_2
+
 def test_unpack_data_blank_line_end():
     result_struct = {}
     qr_generator.unpack_data_recurse(demo_data_blank_line_end(), True, result_struct)
 
     assert demo_data_struct_include_headers() == result_struct
+
+def test_unpack_data_blank_line_end_recurse_equivalence():
+    result_struct_1 = {}
+    qr_generator.unpack_data_recurse(demo_data_blank_line_end(), True, result_struct_1)
+    result_struct_2 = qr_generator.unpack_data(demo_data_blank_line_end(), True)
+
+    assert result_struct_1 == result_struct_2
 
 def test_unpack_data_blank_line_mid():
     result_struct = {}
@@ -171,11 +185,25 @@ def test_unpack_data_no_headers():
 
     assert demo_data_struct_no_headers() == result_struct
 
+def test_unpack_data_no_headers_recurse_equivalence():
+    result_struct_1 = {}
+    qr_generator.unpack_data_recurse(demo_tsv_expected_data(), False, result_struct_1)
+    result_struct_2 = qr_generator.unpack_data(demo_tsv_expected_data(), False)
+
+    assert result_struct_1 == result_struct_2
+
 def test_unpack_data_include_headers_QRHeader():
     result_struct = {}
     qr_generator.unpack_data_recurse(demo_tsv_expected_data(), True, result_struct, r'{image}')
 
     assert demo_data_struct_include_headers_with_QRHeader() == result_struct
+
+def test_unpack_data_include_headers_QRHeader_recurse_equivalence():
+    result_struct_1 = {}
+    qr_generator.unpack_data_recurse(demo_tsv_expected_data(), True, result_struct_1, r'{image}')
+    result_struct_2 = qr_generator.unpack_data(demo_tsv_expected_data(), True, r'{image}')
+
+    assert result_struct_1 == result_struct_2
 
 def test_structure_qr_builder():
     expected_struct = demo_data_struct_no_headers_images()

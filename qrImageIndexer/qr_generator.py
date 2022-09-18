@@ -71,13 +71,27 @@ def generate_qr_code_structure(data_structure : Dict[str, Tuple[Dict, str]]) -> 
     return result
 
 def unpack_data(data : List[List[str]], gen_qr_headings : bool, string_header : str = '') -> Dict[str, Tuple[Dict, str]]:
+    """
+    Function to unpack tabulated text where items are grouped by tab depth. Calls the recursive function to remove the
+    complexity from view of potential users.
+    
+    Inputs:
+        data - List of string representing data
+        gen_qr_headings - Boolean indicating if QR codes are to be built for headings or just for final elements
+        string_header - String to include as header for all QR code values to help distinguish from general QR codes
+
+
+    Returns:
+        index - Data structure in dictionary as required by the remainder of the tool
+
+    """
     _, data_structure = unpack_data_recurse(data, gen_qr_headings, string_header=string_header)
     return data_structure
 
 def unpack_data_recurse(data : List[List[str]], gen_qr_headings : bool, data_structure : Dict[str, Tuple[Dict, str]] = {}, string_header : str = '',
     index : int = 0, previous_levels : str = '') -> Tuple[int, Dict[str, Tuple[Dict, str]]]:
     """
-    Function to unpack a tabulated text file where items are grouped by tab depth. Called recursively for each loweer level of
+    Function to unpack a tabulated text where items are grouped by tab depth. Called recursively for each loweer level of
     the data structure.
 
     Inputs:
@@ -92,8 +106,9 @@ def unpack_data_recurse(data : List[List[str]], gen_qr_headings : bool, data_str
             code for sorting
 
 
-    Returns:
+    Returns below in a Tuple:
         index - integer representing current index of the process
+        data_struct - Data structure in dictionary as required by the remainder of the tool
 
         
     """
