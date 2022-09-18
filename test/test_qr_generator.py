@@ -4,8 +4,7 @@ import pathlib
 from qrImageIndexer import qr_generator
 from os import path
 from PIL import ImageChops
-import pytest
-from unittest import mock
+
 
 def build_demo_tsv(file_path : pathlib.Path):
     content = '''Level1-1
@@ -186,12 +185,3 @@ def test_structure_qr_builder():
     assert not ImageChops.difference(expected_struct['Level1-2'][0]['Level2-2'][0]['Level3'][1], generated_struct['Level1-2'][0]['Level2-2'][0]['Level3'][1]).getbbox()
     assert expected_struct['Level1-2'][0]['Level2-2'][1] == generated_struct['Level1-2'][0]['Level2-2'][1]
 
-# def test_
-
-def mock_qr_generator_functions(mocker : mock):
-    unpack_data = mocker.patch('qrImageIndexer.qr_generator.unpack_data')
-    generate_qr_structure = mocker.patch('qrImageIndexer.qr_generator.generate_qr_code_structure')
-
-
-def test_single_func_pdf_builder():
-    assert False
