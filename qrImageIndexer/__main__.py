@@ -1,4 +1,5 @@
 from qrImageIndexer.qr_generator import load_text_file, print_struct_outline, unpack_data, generate_qr_code_structure
+from qrImageIndexer.generate_qr_wrapper import generate_qr_pdf
 from qrImageIndexer.photo_sorter import sort_directory
 from qrImageIndexer.write_pdf_fpf2 import build_pdf_report
 
@@ -46,17 +47,14 @@ def main():
             sliceable = args.pdf_type[0] == 'sliceable'
 
         text_data = load_text_file(input)
-
-        data_struct = unpack_data(text_data, args.qr_for_headings, string_header)
-        image_struct = generate_qr_code_structure(data_struct)
         
         if verbose:
             print('Loaded text file: ' + input)
             print('')
-            print('Read data structure: ')
-            print_struct_outline(image_struct)
+            print('Read lines: ')
+            print(text_data)
 
-        pdf = build_pdf_report(image_struct, args.repeat_table_headings, sliceable)
+        pdf = generate_qr_pdf(text_data, args.qr_for_headings, args.repeat_table_headings, sliceable, string_header)
         pdf.output(output)
         if verbose:
             print('Saved pdf: ' + output)

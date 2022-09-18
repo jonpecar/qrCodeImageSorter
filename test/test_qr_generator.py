@@ -34,6 +34,25 @@ def demo_tsv_expected_data():
     data.append(['', '', 'Level3'])
     return data
 
+def demo_tsv_drop_index():
+    data = []
+    data.append(['Level1-1'])
+    data.append(['', 'Level2-1'])
+    data.append(['', 'Level2-2'])
+    data.append(['', '', 'Level3'])
+    data.append(['Level1-2'])
+    return data
+
+def demo_data_struct_drop_indexinclude_headers():
+    test_struct = {}
+    test_struct['Level1-1'] = ({}, 'Level1-1' + path.sep)
+    test_struct['Level1-1'][0]['Level2-1'] = ({}, 'Level1-1' + path.sep + 'Level2-1' + path.sep)
+    test_struct['Level1-1'][0]['Level2-2'] = ({}, 'Level1-1' + path.sep + 'Level2-2' + path.sep)
+    test_struct['Level1-1'][0]['Level2-2'][0]['Level3'] = ({}, 'Level1-1' + path.sep + 'Level2-2' + path.sep + 'Level3' + path.sep)
+    test_struct['Level1-2'] = ({}, 'Level1-2' + path.sep)
+    return test_struct
+
+
 def demo_data_blank_line_end():
     data = []
     data.append(['Level1-1'])
@@ -213,3 +232,7 @@ def test_structure_qr_builder():
     assert not ImageChops.difference(expected_struct['Level1-2'][0]['Level2-2'][0]['Level3'][1], generated_struct['Level1-2'][0]['Level2-2'][0]['Level3'][1]).getbbox()
     assert expected_struct['Level1-2'][0]['Level2-2'][1] == generated_struct['Level1-2'][0]['Level2-2'][1]
 
+def test_unpack_data_drop_leve():
+    result_struct = qr_generator.unpack_data(demo_tsv_drop_index(), True)
+
+    assert result_struct == demo_data_struct_drop_indexinclude_headers()

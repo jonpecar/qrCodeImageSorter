@@ -88,7 +88,7 @@ def unpack_data(data : List[List[str]], gen_qr_headings : bool, string_header : 
     _, data_structure = unpack_data_recurse(data, gen_qr_headings, string_header=string_header)
     return data_structure
 
-def unpack_data_recurse(data : List[List[str]], gen_qr_headings : bool, data_structure : Dict[str, Tuple[Dict, str]] = {}, string_header : str = '',
+def unpack_data_recurse(data : List[List[str]], gen_qr_headings : bool, data_structure : Dict[str, Tuple[Dict, str]] = None, string_header : str = '',
     index : int = 0, previous_levels : str = '') -> Tuple[int, Dict[str, Tuple[Dict, str]]]:
     """
     Function to unpack a tabulated text where items are grouped by tab depth. Called recursively for each loweer level of
@@ -112,6 +112,8 @@ def unpack_data_recurse(data : List[List[str]], gen_qr_headings : bool, data_str
 
         
     """
+    if data_structure is None:
+        data_structure = {}
     #Determine target indent from first entry. All subsequent should be the same.
     target_indent = count_leading_indent(data[index])
     while index < len(data):
@@ -121,7 +123,7 @@ def unpack_data_recurse(data : List[List[str]], gen_qr_headings : bool, data_str
             continue
         # Check if this index is less indented than the target. If so we need to return a level.
         if count_leading_indent(data[index]) < target_indent:
-            return index
+            return index, data_structure
 
         # Get some data for this iteration
         raw_line = data[index][target_indent]
