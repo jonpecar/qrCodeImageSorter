@@ -243,7 +243,9 @@ def sort_directory_exisitng_results(results : Dict[str, str], input_dir : str, o
     current_path = os.path.join(output_dir, 'unsorted')
     for image_path in tqdm.tqdm(image_paths) if verbose else image_paths:
         _, image = os.path.split(image_path)
-        qr_string = results[image_path]
+        qr_string = ''
+        if image_path in results:
+            qr_string = results[image_path]
         if qr_string:
             qr_string = sanitise_path(qr_string)
             current_path = os.path.join(output_dir, qr_string)
