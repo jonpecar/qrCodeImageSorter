@@ -203,7 +203,7 @@ def sort_directory(input_dir : str, output_dir : str, string_header : str = '', 
             List[str] of all paths found in QR codes
     """
 
-    found_directories = []
+    
 
     non_image_dir = os.path.join(output_dir, 'non_image_files')
 
@@ -215,15 +215,38 @@ def sort_directory(input_dir : str, output_dir : str, string_header : str = '', 
     os.makedirs(output_dir, exist_ok=True)
 
 
+    found_directories = sort_directory_exisitng_results(results, input_dir, output_dir, verbose)
+
+    found_directories.sort()
+    return found_directories
+
+def sort_directory_exisitng_results(results : Dict[str, str], input_dir : str, output_dir : str, verbose : bool = False) -> List[str]:
+    """
+        Takes results from the QR code scanning and uses that information to sort the images. Function separated from
+        above for better integration with GUI code.
+
+        Parameters:
+            results: Dictionary of results including image path and QR code result
+            input_dir: input directory containing photos as string
+            output_dir: output directory to save images in
+            verbose: whether or not to write verbose output to the terminal
+
+        Returns:
+            List[str] of all paths found in QR codes
+    """
+    found_directories = []
+    non_image_dir = os.path.join(output_dir, 'non_image_files')
+    image_paths = get_image_paths(input_dir, non_image_dir, verbose)
+
     if verbose:
         print('Sorting image files')
     current_path = os.path.join(output_dir, 'unsorted')
     for image_path in tqdm.tqdm(image_paths) if verbose else image_paths:
         _, image = os.path.split(image_path)
-        qr_string = results[image_path]
+        qr_string = ''
+        if image_path in results:
+            qr_string = results[image_path]
         if qr_string:
-            if qr_string.startswith(string_header):
-                qr_string = qr_string[len(string_header):]
             qr_string = sanitise_path(qr_string)
             current_path = os.path.join(output_dir, qr_string)
             if qr_string not in found_directories:
@@ -231,8 +254,5 @@ def sort_directory(input_dir : str, output_dir : str, string_header : str = '', 
             
         os.makedirs(current_path, exist_ok=True)
         shutil.copyfile(image_path, os.path.join(current_path, image))
-
-    found_directories.sort()
+    
     return found_directories
-
-

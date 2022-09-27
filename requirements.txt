@@ -5,3 +5,5 @@ qrcode
 tqdm
 opencv-python
 PyPDF2
+pytest
+pytest-mock

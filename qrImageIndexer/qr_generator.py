@@ -70,10 +70,28 @@ def generate_qr_code_structure(data_structure : Dict[str, Tuple[Dict, str]]) -> 
         result[key] = (sub_struct, image)
     return result
 
-def unpack_data(data : List[List[str]], gen_qr_headings : bool, data_structure : Dict[str, Tuple[Dict, str]], string_header : str = '',
-    index : int = 0, previous_levels : str = '') -> int:
+def unpack_data(data : List[List[str]], gen_qr_headings : bool, string_header : str = '') -> Dict[str, Tuple[Dict, str]]:
     """
-    Function to unpack a tabulated text file where items are grouped by tab depth. Called recursively for each loweer level of
+    Function to unpack tabulated text where items are grouped by tab depth. Calls the recursive function to remove the
+    complexity from view of potential users.
+    
+    Inputs:
+        data - List of string representing data
+        gen_qr_headings - Boolean indicating if QR codes are to be built for headings or just for final elements
+        string_header - String to include as header for all QR code values to help distinguish from general QR codes
+
+
+    Returns:
+        index - Data structure in dictionary as required by the remainder of the tool
+
+    """
+    _, data_structure = unpack_data_recurse(data, gen_qr_headings, string_header=string_header)
+    return data_structure
+
+def unpack_data_recurse(data : List[List[str]], gen_qr_headings : bool, data_structure : Dict[str, Tuple[Dict, str]] = None, string_header : str = '',
+    index : int = 0, previous_levels : str = '') -> Tuple[int, Dict[str, Tuple[Dict, str]]]:
+    """
+    Function to unpack a tabulated text where items are grouped by tab depth. Called recursively for each loweer level of
     the data structure.
 
     Inputs:
@@ -88,11 +106,14 @@ def unpack_data(data : List[List[str]], gen_qr_headings : bool, data_structure :
             code for sorting
 
 
-    Returns:
+    Returns below in a Tuple:
         index - integer representing current index of the process
+        data_struct - Data structure in dictionary as required by the remainder of the tool
 
         
     """
+    if data_structure is None:
+        data_structure = {}
     #Determine target indent from first entry. All subsequent should be the same.
     target_indent = count_leading_indent(data[index])
     while index < len(data):
@@ -102,7 +123,7 @@ def unpack_data(data : List[List[str]], gen_qr_headings : bool, data_structure :
             continue
         # Check if this index is less indented than the target. If so we need to return a level.
         if count_leading_indent(data[index]) < target_indent:
-            return index
+            return index, data_structure
 
         # Get some data for this iteration
         raw_line = data[index][target_indent]
@@ -127,12 +148,12 @@ def unpack_data(data : List[List[str]], gen_qr_headings : bool, data_structure :
         # Check if the next line is further indented or if it is less indented. If more indented then recursively call function.
         # Otherwise increment
         if indent_diff < 0:
-            index = unpack_data(data, gen_qr_headings, next_data_struct, string_header, index + 1, next_level_str)
+            index, _ = unpack_data_recurse(data, gen_qr_headings, next_data_struct, string_header, index + 1, next_level_str)
         else:
             index += 1
 
         
-    return index
+    return index, data_structure
 
 def count_leading_indent(line : List[str]) -> int:
     """

@@ -5,6 +5,7 @@ from qrImageIndexer import qr_generator
 from os import path
 from PIL import ImageChops
 
+
 def build_demo_tsv(file_path : pathlib.Path):
     content = '''Level1-1
 Level1-2
@@ -32,6 +33,25 @@ def demo_tsv_expected_data():
     data.append(['', 'Level2-2'])
     data.append(['', '', 'Level3'])
     return data
+
+def demo_tsv_drop_index():
+    data = []
+    data.append(['Level1-1'])
+    data.append(['', 'Level2-1'])
+    data.append(['', 'Level2-2'])
+    data.append(['', '', 'Level3'])
+    data.append(['Level1-2'])
+    return data
+
+def demo_data_struct_drop_indexinclude_headers():
+    test_struct = {}
+    test_struct['Level1-1'] = ({}, 'Level1-1' + path.sep)
+    test_struct['Level1-1'][0]['Level2-1'] = ({}, 'Level1-1' + path.sep + 'Level2-1' + path.sep)
+    test_struct['Level1-1'][0]['Level2-2'] = ({}, 'Level1-1' + path.sep + 'Level2-2' + path.sep)
+    test_struct['Level1-1'][0]['Level2-2'][0]['Level3'] = ({}, 'Level1-1' + path.sep + 'Level2-2' + path.sep + 'Level3' + path.sep)
+    test_struct['Level1-2'] = ({}, 'Level1-2' + path.sep)
+    return test_struct
+
 
 def demo_data_blank_line_end():
     data = []
@@ -148,33 +168,61 @@ def test_count_leading_indent():
 
 def test_unpack_data_include_headers():
     result_struct = {}
-    qr_generator.unpack_data(demo_tsv_expected_data(), True, result_struct)
+    qr_generator.unpack_data_recurse(demo_tsv_expected_data(), True, result_struct)
 
     assert demo_data_struct_include_headers() == result_struct
+
+def test_unpack_data_include_headers_recurse_equivalence():
+    result_struct_1 = {}
+    qr_generator.unpack_data_recurse(demo_tsv_expected_data(), True, result_struct_1)
+    result_struct_2 = qr_generator.unpack_data(demo_tsv_expected_data(), True)
+
+    assert result_struct_1 == result_struct_2
 
 def test_unpack_data_blank_line_end():
     result_struct = {}
-    qr_generator.unpack_data(demo_data_blank_line_end(), True, result_struct)
+    qr_generator.unpack_data_recurse(demo_data_blank_line_end(), True, result_struct)
 
     assert demo_data_struct_include_headers() == result_struct
 
+def test_unpack_data_blank_line_end_recurse_equivalence():
+    result_struct_1 = {}
+    qr_generator.unpack_data_recurse(demo_data_blank_line_end(), True, result_struct_1)
+    result_struct_2 = qr_generator.unpack_data(demo_data_blank_line_end(), True)
+
+    assert result_struct_1 == result_struct_2
+
 def test_unpack_data_blank_line_mid():
     result_struct = {}
-    qr_generator.unpack_data(demo_data_blank_line_mid(), True, result_struct)
+    qr_generator.unpack_data_recurse(demo_data_blank_line_mid(), True, result_struct)
 
     assert demo_data_struct_include_headers() == result_struct
 
 def test_unpack_data_no_headers():
     result_struct = {}
-    qr_generator.unpack_data(demo_tsv_expected_data(), False, result_struct)
+    qr_generator.unpack_data_recurse(demo_tsv_expected_data(), False, result_struct)
 
     assert demo_data_struct_no_headers() == result_struct
 
+def test_unpack_data_no_headers_recurse_equivalence():
+    result_struct_1 = {}
+    qr_generator.unpack_data_recurse(demo_tsv_expected_data(), False, result_struct_1)
+    result_struct_2 = qr_generator.unpack_data(demo_tsv_expected_data(), False)
+
+    assert result_struct_1 == result_struct_2
+
 def test_unpack_data_include_headers_QRHeader():
     result_struct = {}
-    qr_generator.unpack_data(demo_tsv_expected_data(), True, result_struct, r'{image}')
+    qr_generator.unpack_data_recurse(demo_tsv_expected_data(), True, result_struct, r'{image}')
 
     assert demo_data_struct_include_headers_with_QRHeader() == result_struct
+
+def test_unpack_data_include_headers_QRHeader_recurse_equivalence():
+    result_struct_1 = {}
+    qr_generator.unpack_data_recurse(demo_tsv_expected_data(), True, result_struct_1, r'{image}')
+    result_struct_2 = qr_generator.unpack_data(demo_tsv_expected_data(), True, r'{image}')
+
+    assert result_struct_1 == result_struct_2
 
 def test_structure_qr_builder():
     expected_struct = demo_data_struct_no_headers_images()
@@ -183,3 +231,8 @@ def test_structure_qr_builder():
     assert not ImageChops.difference(expected_struct['Level1-2'][0]['Level2-1'][1], generated_struct['Level1-2'][0]['Level2-1'][1]).getbbox()
     assert not ImageChops.difference(expected_struct['Level1-2'][0]['Level2-2'][0]['Level3'][1], generated_struct['Level1-2'][0]['Level2-2'][0]['Level3'][1]).getbbox()
     assert expected_struct['Level1-2'][0]['Level2-2'][1] == generated_struct['Level1-2'][0]['Level2-2'][1]
+
+def test_unpack_data_drop_leve():
+    result_struct = qr_generator.unpack_data(demo_tsv_drop_index(), True)
+
+    assert result_struct == demo_data_struct_drop_indexinclude_headers()
