@@ -38,7 +38,7 @@ If there are images which appear before the first QR-containing image will be co
 the directory `unsorted/`.
 
 ### Example Input Images
-![Example directory of input images](docs\images\example_sort.png)
+![Example directory of input images](docs/images/example_sort.png)
 
 ## Installation
 ---
