@@ -38,7 +38,7 @@ If there are images which appear before the first QR-containing image will be co
 the directory `unsorted/`.
 
 ### Example Input Images
-![Example directory of input images](docs/images/example_sort.png)
+![Example directory of input images](https://user-images.githubusercontent.com/65805625/192940631-be5f5bc7-c23e-4eed-8610-0a8752c1f950.png)
 
 ## Installation
 ---
@@ -93,7 +93,7 @@ which appear subsequent to a QR code but before the next QR code will be sorted 
 For ease of use it is recommended to use the `--pdf-type sliceable` option, which will allow, when printed single-sided, for the QR codes to be easily sliced
 and stacked for use in-order.
 
-![](docs/images/example_linear_sliceable.png)
+![Demonstration of Linear Slicing](https://user-images.githubusercontent.com/65805625/192940658-6ce1837c-b5d2-46ab-bb6c-876ee1d9eb53.png)
 
 #### File Format
 ---
