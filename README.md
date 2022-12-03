@@ -62,7 +62,7 @@ To use the tool run the command:
 
 Command line useage is as per below:
 ```
-usage: __main__.py [-h] [-g INPUT_TEXT_FILE OUTPUT_PDF | -s INPUT_DIR OUTPUT_DIR] [--pdf-type SORT_TYPE] [-q] [-r] [-p STRING_PREFIX] [-v]
+usage: qrImageIndexer [-h] [-g INPUT_TEXT_FILE OUTPUT_PDF | -s INPUT_DIR OUTPUT_DIR] [--pdf-type SORT_TYPE] [-q] [-r] [-p STRING_PREFIX] [-v]
 
 options:
   -h, --help            show this help message and exit
@@ -136,14 +136,14 @@ Using the option `-v` for any operations will provide verbose status output to t
 
 Assuming that the above demo file is saved as `demo.txt` the following command would generate a PDF with repeated headings and qr codes for each line in a sliceable format, with the prefix `{image}`:
 
-```python -m qr_image_indexer -g demo.txt demo.pdf -r -q --pdf-type sliceable -p "{image}"```
+```python -m qrImageIndexer -g demo.txt demo.pdf -r -q --pdf-type sliceable -p "{image}"```
 
 #### Sorting Images
 ---
 
 After taking photos, these images could then be sorted into a folder called `outputs\` from a folder called `inputs\` as shown below:
 
-```python -m qr_image_indexer -s inputs\ outputs\ -p "{image}"```
+```python -m qrImageIndexer -s inputs\ outputs\ -p "{image}"```
 
 ## Future Features
 ---
