@@ -58,7 +58,7 @@ in the wheel for Windows users): https://pypi.org/project/pyzbar/
 
 To use the tool run the command:
 
-```python -m qr_image_indexer```
+```python -m qrImageIndexer```
 
 Command line useage is as per below:
 ```
