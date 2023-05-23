@@ -249,6 +249,8 @@ def sort_directory_exisitng_results(results : Dict[str, str],
 
     if order_by_date:
         image_paths.sort(key=lambda path: os.path.getmtime(path))
+    else:
+        image_paths.sort()
 
     if verbose:
         print('Sorting image files')

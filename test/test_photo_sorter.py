@@ -147,7 +147,6 @@ def test_qr_sorting(tmp_path : pathlib.Path):
         blank_image = Image.new('RGB', (100,100))
         blank_image.save(inputs / f'{i}_b.png')
 
-
     found_dirs = photo_sorter.sort_directory(inputs.as_posix(), outputs.as_posix())
 
     assert found_dirs == [r'Test1', r'Test1\subTest', r'Test2', r'Test_']
@@ -171,13 +170,13 @@ def test_qr_sorting_by_date(tmp_path : pathlib.Path):
         image = qr_generator.build_qr(qr_strings[i])
         image.save(inputs / (str(i) + '.png'))
 
-        time.sleep(0.005)
+        time.sleep(0.01)
         #Need to make sure it doesn't write too fast or they can have the same timestamp
 
         blank_image = Image.new('RGB', (100,100))
         blank_image.save(inputs / f'#{i}.png')
 
-        time.sleep(0.005)
+        time.sleep(0.01)
 
 
     found_dirs = photo_sorter.sort_directory(inputs.as_posix(), outputs.as_posix(), order_by_date=True)
