@@ -187,7 +187,12 @@ def get_image_paths(input_dir : str,  non_image_dir : str, verbose : bool = Fals
     return image_paths
 
 
-def sort_directory(input_dir : str, output_dir : str, string_header : str = '', verbose : bool = False, binarization : bool = False) -> List[str]:
+def sort_directory(input_dir : str,
+                   output_dir : str, 
+                   string_header : str = '', 
+                   verbose : bool = False, 
+                   binarization : bool = False, 
+                   order_by_date : bool = False) -> List[str]:
     """
         Takes all images in a directory and sorts them by QR codes found in the images. Any
         images which are found before the first QR code will go into an "unsorted" folder in the directory.
@@ -215,12 +220,16 @@ def sort_directory(input_dir : str, output_dir : str, string_header : str = '', 
     os.makedirs(output_dir, exist_ok=True)
 
 
-    found_directories = sort_directory_exisitng_results(results, input_dir, output_dir, verbose)
+    found_directories = sort_directory_exisitng_results(results, input_dir, output_dir, verbose, order_by_date=order_by_date)
 
     found_directories.sort()
     return found_directories
 
-def sort_directory_exisitng_results(results : Dict[str, str], input_dir : str, output_dir : str, verbose : bool = False) -> List[str]:
+def sort_directory_exisitng_results(results : Dict[str, str], 
+                                    input_dir : str, 
+                                    output_dir : str, 
+                                    verbose : bool = False,
+                                    order_by_date : bool = False) -> List[str]:
     """
         Takes results from the QR code scanning and uses that information to sort the images. Function separated from
         above for better integration with GUI code.
@@ -237,6 +246,11 @@ def sort_directory_exisitng_results(results : Dict[str, str], input_dir : str, o
     found_directories = []
     non_image_dir = os.path.join(output_dir, 'non_image_files')
     image_paths = get_image_paths(input_dir, non_image_dir, verbose)
+
+    if order_by_date:
+        image_paths.sort(key=lambda path: os.path.getmtime(path))
+    else:
+        image_paths.sort()
 
     if verbose:
         print('Sorting image files')
