@@ -142,10 +142,10 @@ def test_qr_sorting(tmp_path : pathlib.Path):
     inputs.mkdir()
     for i in range(len(qr_strings)):
         image = qr_generator.build_qr(qr_strings[i])
-        image.save(inputs / (str(i * 2) + '.png'))
+        image.save(inputs / f'{i}_a.png')
 
         blank_image = Image.new('RGB', (100,100))
-        blank_image.save(inputs / f'{i*2 + 1}.png')
+        blank_image.save(inputs / f'{i}_b.png')
 
 
     found_dirs = photo_sorter.sort_directory(inputs.as_posix(), outputs.as_posix())
@@ -158,8 +158,8 @@ def test_qr_sorting(tmp_path : pathlib.Path):
         for filename in os.listdir(path.as_posix()):
             if os.path.isfile(path/filename): filecount += 1
         assert filecount == 2
-        assert (str(i*2) + '.png') in os.listdir(path.as_posix())
-        assert f'{i*2 + 1}.png' in os.listdir(path.as_posix())
+        assert f'{i}_a.png' in os.listdir(path.as_posix())
+        assert f'{i}_b.png' in os.listdir(path.as_posix())
 
 def test_qr_sorting_by_date(tmp_path : pathlib.Path):
     qr_strings = [r'Test1\subTest', r'Test1', r'Test2', r'Test?']
