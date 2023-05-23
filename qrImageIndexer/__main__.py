@@ -27,6 +27,9 @@ def main():
 
     parser.add_argument('-v', '--verbose', help='Turn progress text to terminal on or off',
             action='store_true')
+    
+    parser.add_argument('-d', '--datestamp', help='Use file modified time to sort the incoming images instead of file name',
+            action='store_true')
 
     args = parser.parse_args()
 
@@ -65,7 +68,7 @@ def main():
         if verbose:
             print('Sorting from: ' + input + ', to : ' + output)
 
-        found_dirs = sort_directory(input, output, string_header, args.verbose, True)
+        found_dirs = sort_directory(input, output, string_header, args.verbose, True, order_by_date=args.datestamp)
 
         if verbose:
             print('Found directories from images:')

@@ -2,7 +2,9 @@ from os import listdir
 from qrImageIndexer import photo_sorter, qr_generator
 import pathlib
 import os
+import time
 from typing import Dict
+from PIL import Image, ImageMode
 
 def generate_image(tmp_path : pathlib.Path, string : str, filename : str = 'test') -> str:
     '''
@@ -140,7 +142,10 @@ def test_qr_sorting(tmp_path : pathlib.Path):
     inputs.mkdir()
     for i in range(len(qr_strings)):
         image = qr_generator.build_qr(qr_strings[i])
-        image.save(inputs / (str(i) + '.png'))
+        image.save(inputs / (str(i * 2) + '.png'))
+
+        blank_image = Image.new('RGB', (100,100))
+        blank_image.save(inputs / f'{i*2 + 1}.png')
 
 
     found_dirs = photo_sorter.sort_directory(inputs.as_posix(), outputs.as_posix())
@@ -152,5 +157,39 @@ def test_qr_sorting(tmp_path : pathlib.Path):
         filecount = 0
         for filename in os.listdir(path.as_posix()):
             if os.path.isfile(path/filename): filecount += 1
-        assert filecount == 1
-        assert os.listdir(path.as_posix())[0] == (str(i) + '.png')
+        assert filecount == 2
+        assert (str(i*2) + '.png') in os.listdir(path.as_posix())
+        assert f'{i*2 + 1}.png' in os.listdir(path.as_posix())
+
+def test_qr_sorting_by_date(tmp_path : pathlib.Path):
+    qr_strings = [r'Test1\subTest', r'Test1', r'Test2', r'Test?']
+    inputs = tmp_path/'inputs'
+    outputs = tmp_path/'outputs'
+    outputs.mkdir()
+    inputs.mkdir()
+    for i in range(len(qr_strings)):
+        image = qr_generator.build_qr(qr_strings[i])
+        image.save(inputs / (str(i) + '.png'))
+
+        time.sleep(0.005)
+        #Need to make sure it doesn't write too fast or they can have the same timestamp
+
+        blank_image = Image.new('RGB', (100,100))
+        blank_image.save(inputs / f'#{i}.png')
+
+        time.sleep(0.005)
+
+
+    found_dirs = photo_sorter.sort_directory(inputs.as_posix(), outputs.as_posix(), order_by_date=True)
+
+    assert found_dirs == [r'Test1', r'Test1\subTest', r'Test2', r'Test_']
+
+    for i in range(len(qr_strings)):
+        path = outputs/photo_sorter.sanitise_path(qr_strings[i])
+        filecount = 0
+        for filename in os.listdir(path.as_posix()):
+            if os.path.isfile(path/filename): filecount += 1
+        assert filecount == 2
+        assert (str(i) + '.png') in os.listdir(path.as_posix())
+        assert f'#{i}.png' in os.listdir(path.as_posix())
+
