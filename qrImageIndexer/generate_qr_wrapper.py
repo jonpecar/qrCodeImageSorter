@@ -1,4 +1,3 @@
-from distutils.command import build
 from typing import List
 from fpdf import FPDF
 from qrImageIndexer.qr_generator import unpack_data, generate_qr_code_structure
