@@ -24,7 +24,7 @@ dependencies = [
         "tqdm",
         "opencv-python"
 ]
-requires-python = ">=3.6"
+requires-python = ">=3.8"
 [project.optional-dependencies]
 dev = ["pytest", "bumpver", "setuptools"]
 
